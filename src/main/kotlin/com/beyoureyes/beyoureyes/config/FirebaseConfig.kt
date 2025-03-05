@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
+import java.io.FileNotFoundException
 import java.io.IOException
 
 
@@ -25,13 +26,17 @@ class FirebaseConfig {
     @Bean
     @Throws(IOException::class)
     fun firebaseApp(): FirebaseApp {
+        val inputStream = this::class.java.classLoader.getResourceAsStream(account)
+            ?: throw FileNotFoundException("File $account not found in classpath")
+
         val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(ClassPathResource(account).inputStream))
+            .setCredentials(GoogleCredentials.fromStream(inputStream))
             .setStorageBucket(bucket)
             .build()
 
         return FirebaseApp.initializeApp(options)
     }
+
 
     @Bean
     @Throws(IOException::class)
