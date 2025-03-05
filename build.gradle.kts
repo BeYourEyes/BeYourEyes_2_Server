@@ -47,6 +47,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
 	implementation("com.google.firebase:firebase-admin:9.2.0")
+	implementation("com.google.protobuf:protobuf-java:3.24.0")
 
 
 }
