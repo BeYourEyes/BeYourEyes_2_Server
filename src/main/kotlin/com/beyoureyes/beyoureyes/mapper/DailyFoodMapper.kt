@@ -11,8 +11,8 @@ interface DailyFoodMapper {
 
     @Update("""
         CREATE TABLE IF NOT EXISTS DailyFood (
-            log_id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
+            log_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            user_id BIGINT NOT NULL,
             date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             food_photo VARCHAR(255),
             calories DECIMAL(10, 2) DEFAULT 0.0,

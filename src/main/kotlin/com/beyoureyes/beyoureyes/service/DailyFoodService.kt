@@ -13,15 +13,17 @@ import com.google.cloud.storage.Bucket
 import java.time.LocalDateTime
 
 @Service
-class DailyFoodService (
+class DailyFoodService(
     private val bucket: Bucket,
     private val dailyFoodMapper: DailyFoodMapper
 ) {
 
     @Transactional
     fun saveDailyFood(userId: Long, image: MultipartFile, request: DailyFoodRequestDto): String {
+        // 이미지 업로드 및 URL 생성
         val imageUrl = uploadImageToFirebase(image)
 
+        // DailyFood 엔티티 생성
         val dailyFood = DailyFood(
             userId = userId,
             dateTime = LocalDateTime.now(),
@@ -36,11 +38,12 @@ class DailyFoodService (
             saturatedFat = request.saturatedFat
         )
 
+        // 데이터베이스에 저장
         dailyFoodMapper.insertDailyFood(dailyFood)
         return imageUrl
     }
 
-    private fun uploadImageToFirebase(image: MultipartFile): String {
+    fun uploadImageToFirebase(image: MultipartFile): String {
         val fileName = "daily_food/${UUID.randomUUID()}_${image.originalFilename}"
         val blob = bucket.create(fileName, image.bytes, image.contentType)
         return "https://storage.googleapis.com/${bucket.name}/${blob.name}"

@@ -1,18 +1,16 @@
 package com.beyoureyes.beyoureyes.service
 
-import com.beyoureyes.beyoureyes.mapper.AllergyMapper
-import com.beyoureyes.beyoureyes.mapper.DiseaseMapper
-import com.beyoureyes.beyoureyes.mapper.UserInfoMapper
-import com.beyoureyes.beyoureyes.mapper.UserMapper
+import com.beyoureyes.beyoureyes.mapper.*
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
 
 @Service
 class DatabaseService(
     private val userMapper : UserMapper,
-    private val  userInfoMapper: UserInfoMapper,
+    private val userInfoMapper: UserInfoMapper,
     private val allergyMapper: AllergyMapper,
     private val diseaseMapper: DiseaseMapper,
+    private val dailyFoodMapper : DailyFoodMapper
 ) {
     @PostConstruct
     fun init() {
@@ -20,5 +18,6 @@ class DatabaseService(
         userInfoMapper.createTableIfNotExists()
         allergyMapper.createTableIfNotExists()
         diseaseMapper.createTableIfNotExists()
+        dailyFoodMapper.createTableIfNotExists()
     }
 }
