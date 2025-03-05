@@ -24,6 +24,7 @@ class SecurityConfig(private val jwtUtil: JwtUtil) {
                     .requestMatchers("/", "/user/login", "/user/verify-token").permitAll()
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                     .requestMatchers("/user/save-user", "/user/user-info", "/user/update").authenticated()
+                    .requestMatchers("/food/record", "/food/today", "/food/today/summary").authenticated()
                     .anyRequest().permitAll()
             }
 
