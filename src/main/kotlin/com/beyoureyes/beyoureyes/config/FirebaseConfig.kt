@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
 import java.io.IOException
 
+
+
 @Configuration
 class FirebaseConfig {
 
