@@ -2,6 +2,7 @@ package com.beyoureyes.beyoureyes.service
 
 import com.beyoureyes.beyoureyes.dto.DailyFoodRequestDto
 import com.beyoureyes.beyoureyes.dto.DailyFoodResponseDto
+import com.beyoureyes.beyoureyes.dto.NutrientSummaryDto
 import com.beyoureyes.beyoureyes.entity.DailyFood
 import com.beyoureyes.beyoureyes.mapper.DailyFoodMapper
 import com.google.common.collect.Multimap
@@ -54,6 +55,11 @@ class DailyFoodService(
     fun getTodayDailyFoods(userId: Long): List<DailyFoodResponseDto> {
         val today = LocalDate.now().toString()
         return dailyFoodMapper.getDailyFoodsByDate(userId, today)
+    }
+
+    fun getTodayNutrientSummary(userId: Long): NutrientSummaryDto {
+        val today = LocalDate.now().toString()
+        return dailyFoodMapper.getNutrientSummaryByDate(userId, today)
     }
 
 }

@@ -1,6 +1,7 @@
 package com.beyoureyes.beyoureyes.mapper
 
 import com.beyoureyes.beyoureyes.dto.DailyFoodResponseDto
+import com.beyoureyes.beyoureyes.dto.NutrientSummaryDto
 import com.beyoureyes.beyoureyes.entity.DailyFood
 import org.apache.ibatis.annotations.*
 
@@ -54,4 +55,23 @@ interface DailyFoodMapper {
         @Param("userId") userId: Long,
         @Param("date") date: String
     ): List<DailyFoodResponseDto>
+
+    @Select("""
+        SELECT 
+            SUM(calories) as calories,
+            SUM(carbohydrates) as carbohydrates,
+            SUM(protein) as protein,
+            SUM(fat) as fat,
+            SUM(cholesterol) as cholesterol,
+            SUM(sodium) as sodium,
+            SUM(sugar) as sugar,
+            SUM(saturated_fat) as saturatedFat
+        FROM DailyFood 
+        WHERE user_id = #{userId} 
+        AND DATE(date_time) = #{date}
+    """)
+    fun getNutrientSummaryByDate(
+        @Param("userId") userId: Long,
+        @Param("date") date: String
+    ): NutrientSummaryDto
 }

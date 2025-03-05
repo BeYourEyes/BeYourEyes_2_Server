@@ -2,6 +2,7 @@ package com.beyoureyes.beyoureyes.controller
 
 import com.beyoureyes.beyoureyes.dto.DailyFoodRequestDto
 import com.beyoureyes.beyoureyes.dto.DailyFoodResponseDto
+import com.beyoureyes.beyoureyes.dto.NutrientSummaryDto
 import com.beyoureyes.beyoureyes.dto.ResponseDto
 import com.beyoureyes.beyoureyes.service.DailyFoodService
 import com.beyoureyes.beyoureyes.utils.ResponseUtil
@@ -48,5 +49,13 @@ class DailyFoodController(
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
         val dailyFoods = dailyFoodService.getTodayDailyFoods(userId)
         return ResponseEntity.ok(ResponseUtil.success("오늘 섭취한 음식 기록 조회 성공", dailyFoods))
+    }
+
+    @GetMapping("/today/summary")
+    @Operation(summary = "오늘 섭취한 총 영양소 조회", description = "오늘 날짜에 저장된 모든 음식의 영양소 합계를 반환합니다.")
+    fun getTodayNutrientSummary(): ResponseEntity<ResponseDto<NutrientSummaryDto>> {
+        val userId = SecurityContextHolder.getContext().authentication.principal as Long
+        val nutrientSummary = dailyFoodService.getTodayNutrientSummary(userId)
+        return ResponseEntity.ok(ResponseUtil.success("오늘 섭취한 총 영양소 조회 성공", nutrientSummary))
     }
 }
