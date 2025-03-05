@@ -12,7 +12,7 @@ class DatabaseService(
     private val userMapper : UserMapper,
     private val  userInfoMapper: UserInfoMapper,
     private val allergyMapper: AllergyMapper,
-    private val diseaseMapper: DiseaseMapper
+    private val diseaseMapper: DiseaseMapper,
 ) {
     @PostConstruct
     fun init() {
