@@ -1,10 +1,7 @@
 package com.beyoureyes.beyoureyes.mapper
 
 import com.beyoureyes.beyoureyes.entity.DailyFood
-import org.apache.ibatis.annotations.Insert
-import org.apache.ibatis.annotations.Mapper
-import org.apache.ibatis.annotations.Options
-import org.apache.ibatis.annotations.Update
+import org.apache.ibatis.annotations.*
 
 @Mapper
 interface DailyFoodMapper {
@@ -39,7 +36,8 @@ interface DailyFoodMapper {
     """)
     @Options(useGeneratedKeys = true, keyProperty = "logId")
     fun insertDailyFood(dailyFood : DailyFood): Int
-
+    @Select("SELECT food_photo FROM DailyFood")
+    fun getAllImageUrls(): List<String>
     @Update("DELETE FROM DailyFood")
     fun deleteAllDailyFood(): Int
 }
