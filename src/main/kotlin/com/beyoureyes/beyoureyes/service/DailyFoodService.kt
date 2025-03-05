@@ -1,6 +1,7 @@
 package com.beyoureyes.beyoureyes.service
 
 import com.beyoureyes.beyoureyes.dto.DailyFoodRequestDto
+import com.beyoureyes.beyoureyes.dto.DailyFoodResponseDto
 import com.beyoureyes.beyoureyes.entity.DailyFood
 import com.beyoureyes.beyoureyes.mapper.DailyFoodMapper
 import com.google.common.collect.Multimap
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.util.*
 import com.google.cloud.storage.Blob
 import com.google.cloud.storage.Bucket
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
@@ -48,4 +50,10 @@ class DailyFoodService(
         val blob = bucket.create(fileName, image.bytes, image.contentType)
         return "https://storage.googleapis.com/${bucket.name}/${blob.name}"
     }
+
+    fun getTodayDailyFoods(userId: Long): List<DailyFoodResponseDto> {
+        val today = LocalDate.now().toString()
+        return dailyFoodMapper.getDailyFoodsByDate(userId, today)
+    }
+
 }

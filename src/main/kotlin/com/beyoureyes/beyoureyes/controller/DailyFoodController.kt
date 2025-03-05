@@ -1,6 +1,7 @@
 package com.beyoureyes.beyoureyes.controller
 
 import com.beyoureyes.beyoureyes.dto.DailyFoodRequestDto
+import com.beyoureyes.beyoureyes.dto.DailyFoodResponseDto
 import com.beyoureyes.beyoureyes.dto.ResponseDto
 import com.beyoureyes.beyoureyes.service.DailyFoodService
 import com.beyoureyes.beyoureyes.utils.ResponseUtil
@@ -39,5 +40,13 @@ class DailyFoodController(
         val imageUrl = dailyFoodService.saveDailyFood(userId, image, foodDto)
 
         return ResponseEntity.ok(ResponseUtil.success("음식 섭취 기록이 저장되었습니다.", imageUrl))
+    }
+
+    @GetMapping("/today")
+    @Operation(summary = "오늘 섭취한 모든 음식 기록 조회", description = "오늘 날짜에 저장된 모든 음식 섭취 기록을 반환합니다.")
+    fun getTodayDailyFoods(): ResponseEntity<ResponseDto<List<DailyFoodResponseDto>>> {
+        val userId = SecurityContextHolder.getContext().authentication.principal as Long
+        val dailyFoods = dailyFoodService.getTodayDailyFoods(userId)
+        return ResponseEntity.ok(ResponseUtil.success("오늘 섭취한 음식 기록 조회 성공", dailyFoods))
     }
 }
