@@ -39,4 +39,7 @@ interface DailyFoodMapper {
     """)
     @Options(useGeneratedKeys = true, keyProperty = "logId")
     fun insertDailyFood(dailyFood : DailyFood): Int
+
+    @Update("DELETE FROM DailyFood")
+    fun deleteAllDailyFood(): Int
 }
