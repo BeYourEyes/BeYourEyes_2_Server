@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 class SecurityConfig(private val jwtUtil: JwtUtil) {
@@ -37,5 +40,19 @@ class SecurityConfig(private val jwtUtil: JwtUtil) {
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration) : AuthenticationManager {
         return authenticationConfiguration.authenticationManager
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration().apply {
+            addAllowedOriginPattern("*") // 모든 Origin 허용 (임시로)
+            addAllowedMethod("*") // 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
+            addAllowedHeader("*") // 모든 헤더 허용
+            allowCredentials = true // 쿠키 및 인증정보 허용
+        }
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 }
