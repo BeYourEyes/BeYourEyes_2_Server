@@ -16,7 +16,7 @@ class JwtUtil {
         private val secretKey: SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
     }
 
-    fun generateToken(userId: Long): String {
+    fun generateAccessToken(userId: Long): String {
         return Jwts.builder()
             .setSubject(userId.toString())
             .setIssuedAt(Date())
@@ -24,6 +24,16 @@ class JwtUtil {
             .signWith(secretKey)
             .compact()
     }
+
+    fun generateRefreshToken(userId: Long): String {
+        return Jwts.builder()
+            .setSubject(userId.toString())
+            .setIssuedAt(Date())
+            .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // 7일 유효
+            .signWith(secretKey)
+            .compact()
+    }
+
 
     fun validateToken(token: String): Boolean {
         return try {
@@ -35,15 +45,15 @@ class JwtUtil {
     }
 
     fun extractUserId(token: String): Long? {
-        return try{
+        return try {
             val claims = extractClaims(token)
             claims.subject.toLongOrNull()
-        } catch(e : Exception) {
+        } catch (e: Exception) {
             null
         }
     }
 
-    private fun extractClaims(token : String) : Claims {
+    fun extractClaims(token: String): Claims {
         return Jwts.parserBuilder()
             .setSigningKey(secretKey)
             .build()

@@ -24,9 +24,9 @@ class SecurityConfig(private val jwtUtil: JwtUtil) {
             .sessionManagement{it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/", "/user/login", "/user/verify-token").permitAll()
+                    .requestMatchers("/", "/user/login", "/user/verify-token", "/user/save-user").permitAll()
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                    .requestMatchers("/user/save-user", "/user/user-info", "/user/update").authenticated()
+                    .requestMatchers("/user/user-info", "/user/update").authenticated()
                     .requestMatchers("/food/record", "/food/today", "/food/today/summary").authenticated()
                     .anyRequest().permitAll()
             }

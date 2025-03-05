@@ -3,6 +3,7 @@ package com.beyoureyes.beyoureyes.controller
 import com.beyoureyes.beyoureyes.dto.ResponseDto
 import com.beyoureyes.beyoureyes.entity.Allergy
 import com.beyoureyes.beyoureyes.entity.Disease
+import com.beyoureyes.beyoureyes.jwt.JwtUtil
 import com.beyoureyes.beyoureyes.service.UserInfoService
 import com.beyoureyes.beyoureyes.service.UserService
 import com.beyoureyes.beyoureyes.utils.ResponseUtil
@@ -21,19 +22,37 @@ import org.springframework.web.bind.annotation.*
 * */
 @RestController
 @RequestMapping("/user")
-class UserInfoController(private val userInfoService: UserInfoService) {
+class UserInfoController(
+    private val userInfoService: UserInfoService,
+    private val userService: UserService,
+    private val jwtUtil: JwtUtil
+) {
 
     @PostMapping("/save-user")
-    fun saveUserInfo(@RequestBody request: Map<String, Any>): ResponseEntity<ResponseDto<Unit>> {
-        // JWT 필터를 통해 인증된 사용자 ID 가져오기
-        val userId = SecurityContextHolder.getContext().authentication.principal as Long
+    fun saveUserInfo(@RequestBody request: Map<String, Any>): ResponseEntity<out ResponseDto<out String?>> {
+        val deviceId = request["device_id"] as? String
+            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("device_id가 필요합니다.", null))
 
-        val userBirth = request["user_birth"] as? String ?: return ResponseEntity.badRequest().body(ResponseUtil.error("생년월일이 필요합니다.", Unit))
-        val userGender = request["user_gender"] as? Int ?: return ResponseEntity.badRequest().body(ResponseUtil.error("성별이 필요합니다.", Unit))
-        val userNickname = request["user_nickname"] as? String ?: return ResponseEntity.badRequest().body(ResponseUtil.error("닉네임이 필요합니다.", Unit))
+        val userBirth = request["user_birth"] as? String
+            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("생년월일이 필요합니다.", null))
 
-        // 알러지 정보 매핑
-        val allergyMap = request["allergy"] as? Map<String, Boolean> ?: return ResponseEntity.badRequest().body(ResponseUtil.error("알러지 정보가 필요합니다.", Unit))
+        val userGender = request["user_gender"] as? Int
+            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("성별이 필요합니다.", null))
+
+        val userNickname = request["user_nickname"] as? String
+            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("닉네임이 필요합니다.", null))
+
+        val allergyMap = request["allergy"] as? Map<String, Boolean>
+            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("알러지 정보가 필요합니다.", null))
+
+        val diseaseMap = request["disease"] as? Map<String, Boolean>
+            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("질환 정보가 필요합니다.", null))
+
+        // 1. 유저 생성 및 user_id 가져오기
+        val userId = userService.createUser(deviceId)
+            ?: return ResponseEntity.status(500).body(ResponseUtil.error("사용자 생성 실패", null))
+
+        // 2. 알러지 및 질환 데이터 매핑
         val allergy = Allergy(
             userId = userId,
             buckwheat = allergyMap["buckwheat"] ?: false,
@@ -57,8 +76,6 @@ class UserInfoController(private val userInfoService: UserInfoService) {
             chicken = allergyMap["chicken"] ?: false
         )
 
-        // 질환 정보 매핑
-        val diseaseMap = request["disease"] as? Map<String, Boolean> ?: return ResponseEntity.badRequest().body(ResponseUtil.error("질환 정보가 필요합니다.", Unit))
         val disease = Disease(
             userId = userId,
             diabetes = diseaseMap["diabetes"] ?: false,
@@ -66,17 +83,26 @@ class UserInfoController(private val userInfoService: UserInfoService) {
             hyperlipidemia = diseaseMap["hyperlipidemia"] ?: false
         )
 
-        return if (userInfoService.saveUserInfo(userId, userBirth, userGender, userNickname, allergy, disease)) {
-            ResponseEntity.ok(ResponseUtil.success("사용자 정보가 저장되었습니다.", Unit))
+        // 3. 사용자 정보 저장
+        if (userInfoService.saveUserInfo(userId, userBirth, userGender, userNickname, allergy, disease)) {
+            val accessToken = jwtUtil.generateAccessToken(userId)
+            val refreshToken = jwtUtil.generateRefreshToken(userId)
+
+            // Refresh Token을 DB에 저장
+            userService.updateRefreshToken(userId, refreshToken)
+
+            return ResponseEntity.ok(ResponseUtil.success("사용자 정보가 저장되었습니다.", accessToken))
         } else {
-            ResponseEntity.status(500).body(ResponseUtil.error("사용자 정보 저장 실패", Unit))
+            return ResponseEntity.status(500).body(ResponseUtil.error("사용자 정보 저장 실패", null))
         }
     }
+
 
     @GetMapping("/user-info")
     fun getUserInfo(): ResponseEntity<ResponseDto<Map<String, Any?>>> {
         // JWT 필터를 통해 인증된 사용자 ID 가져오기
         val userId = SecurityContextHolder.getContext().authentication.principal.toString().toLong()
+
 
         val (userInfo, allergy, disease) = userInfoService.getUserDetails(userId)
 

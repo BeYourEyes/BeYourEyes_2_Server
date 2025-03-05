@@ -11,7 +11,8 @@ interface UserMapper {
             user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             device_id VARCHAR(255) UNIQUE NOT NULL,
             last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            deleted_at TIMESTAMP NULL DEFAULT NULL
+            deleted_at TIMESTAMP NULL DEFAULT NULL,
+            refresh_token VARCHAR(500) DEFAULT NULL
         )
     """)
     fun createTableNotExists()
@@ -41,4 +42,10 @@ interface UserMapper {
 
     @Update("UPDATE user SET deleted_at = NULL WHERE user_id = #{userId}")
     fun reactivateUser(userId: Long) : Int
+
+    @Update("UPDATE user SET refresh_token = #{refreshToken} WHERE user_id = #{userId}")
+    fun updateRefreshToken(userId: Long, refreshToken: String)
+
+    @Select("SELECT refresh_token FROM user WHERE user_id = #{userId}")
+    fun getRefreshToken(userId: Long): String?
 }

@@ -12,10 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/user")
@@ -24,59 +21,29 @@ class UserController(private val userService: UserService) {
 
 
     @PostMapping("/login")
-    @Operation(
-        summary = "익명 로그인",
-        description = "안드로이드 디바이스 id를 이용해 토큰을 발급합니다.",
-        responses = [
-            ApiResponse(
-                responseCode = "200",
-                description = "로그인 성공",
-                content = [Content(
-                    schema = Schema(implementation = ResponseDto::class),
-                    examples = [ExampleObject(value = """
-                        {
-                          "status": "SUCCESS",
-                          "message": "익명 로그인 처리 되었습니다.",
-                          "data": "발급된 JWT 토큰 값"
-                        }
-                    """)]
-                )]
-            ),
-            ApiResponse(
-                responseCode = "400",
-                description = "디바이스 ID 빈 값",
-                content = [Content(
-                    examples = [ExampleObject(value = """
-                        {
-                          "status" : "ERROR",
-                          "message" : "device_id가 빈값입니다.",
-                          "data" : ""
-                        }
-                    """)]
-                )]
-            ),
-            ApiResponse(
-                responseCode = "500",
-                description = "서버 오류",
-                content = [Content(
-                    examples = [ExampleObject(value = """
-                        {
-                          "status": "ERROR",
-                          "message": "서버 오류가 발생했습니다.",
-                          "data": ""
-                        }
-                    """)]
-                )]
-            )
-        ]
-    )
-    fun postLogin(@Valid @RequestBody request: LoginRequestDto): ResponseEntity<ResponseDto<String>> {
+    fun postLogin(@Valid @RequestBody request: LoginRequestDto): ResponseEntity<out ResponseDto<out String?>> {
         val deviceId = request.device_id
-        if (deviceId == "") {
-            return ResponseEntity.badRequest().body(ResponseUtil.error("device_id가 빈값입니다.", ""))
+        if (deviceId.isBlank()) {
+            return ResponseEntity.badRequest().body(ResponseUtil.error("device_id가 빈값입니다.", null))
         }
-        val token = userService.login(deviceId)
-        return ResponseEntity.ok(ResponseUtil.success("익명 로그인 처리 되었습니다.", token))
+
+        // UserService에서 직접 ResponseEntity를 반환하도록 수정
+        return userService.login(deviceId)
+    }
+
+    @PostMapping("/refresh-token")
+    fun refreshAccessToken(
+        @RequestHeader("Authorization") authHeader: String
+    ): ResponseEntity<ResponseDto<String>> {
+        if (!authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body(ResponseUtil.error("Authorization 헤더가 필요합니다.", ""))
+        }
+
+        val accessToken = authHeader.substring(7)
+        val newAccessToken = userService.refreshAccessToken(accessToken)
+            ?: return ResponseEntity.status(401).body(ResponseUtil.error("유효하지 않은 Refresh Token입니다.", ""))
+
+        return ResponseEntity.ok(ResponseUtil.success("Access Token 재발급 성공", newAccessToken))
     }
 
     @PostMapping("/verify-token")
