@@ -134,7 +134,23 @@ class UserInfoController(
             ResponseEntity.ok(ResponseUtil.success("사용자 정보가 업데이트 되었습니다.", Unit))
 
         } else {
-            ResponseEntity.status(500).body(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", Unit))
+            ResponseEntity.ok(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", Unit))
+        }
+
+    }
+
+    @GetMapping("/check-nickname")
+    fun checkNickname(@RequestParam nickname: String): ResponseEntity<ResponseDto<Boolean>> {
+        if (nickname.isBlank()) {
+            return ResponseEntity.badRequest().body(ResponseUtil.error("닉네임이 필요합니다.", false))
+        }
+
+        val isAvailable = userInfoService.isNicknameAvaliable(nickname)
+
+        return if (isAvailable) {
+            ResponseEntity.ok(ResponseUtil.success("사용 가능한 닉네임입니다.", true))
+        } else {
+            ResponseEntity.ok(ResponseUtil.error("이미 사용 중인 닉네임입니다.", false))
         }
     }
 }

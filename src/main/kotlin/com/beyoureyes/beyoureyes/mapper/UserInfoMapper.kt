@@ -44,4 +44,9 @@ interface UserInfoMapper {
     """)
     fun updateUserInfo(userId: Long, userBirth :String?, userGender: Int?, userNickname : String?) : Int
 
+    @Select("SELECT COUNT(*) FROM userInfo WHERE user_nickname = #{nickname}")
+    fun countByNickname(nickname: String): Int
+
+    @Select("SELECT * FROM userInfo")
+    fun getAllUserInfo(): List<Map<String, Any>>
 }

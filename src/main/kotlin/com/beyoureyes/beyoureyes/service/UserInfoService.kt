@@ -70,6 +70,7 @@ class UserInfoService(
             diseaseMapper.updateDisease(userId, it)
         }
 
-        return updated
+    fun isNicknameAvaliable(nickname : String): Boolean {
+        return userInfoMapper.countByNickname(nickname) == 0
     }
 }
