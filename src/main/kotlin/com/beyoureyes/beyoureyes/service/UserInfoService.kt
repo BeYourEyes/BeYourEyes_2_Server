@@ -73,4 +73,6 @@ class UserInfoService(
     fun isNicknameAvaliable(nickname : String): Boolean {
         return userInfoMapper.countByNickname(nickname) == 0
     }
+
+    fun getAllUserInfo() = userInfoMapper.getAllUserInfo()
 }

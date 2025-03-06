@@ -43,5 +43,8 @@ interface DiseaseMapper {
             hyperlipidemia = COALESCE(#{diseaseMap[hyperlipidemia]}, hyperlipidemia)
         WHERE user_id = #{userId}
     """)
-    fun updateDisease(userId : Long, diseaseMap : Map<String, Boolean>) : Int
+    fun updateDisease(userId: Long, diseaseMap: Map<String, Boolean>): Int
+
+    @Select("SELECT * FROM Disease")
+    fun getAllDisease(): List<Map<String, Any>>
 }

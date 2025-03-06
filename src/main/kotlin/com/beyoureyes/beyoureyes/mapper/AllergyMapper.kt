@@ -80,4 +80,7 @@ interface AllergyMapper {
         WHERE user_id = #{userId}
     """)
     fun updateAllergy(userId: Long, allergyMap: Map<String, Boolean>) : Int
+
+    @Select("SELECT * FROM Allergy")
+    fun getAllAllergy(): List<Map<String, Any>>
 }
