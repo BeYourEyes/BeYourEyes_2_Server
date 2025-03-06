@@ -74,4 +74,7 @@ interface DailyFoodMapper {
         @Param("userId") userId: Long,
         @Param("date") date: String
     ): NutrientSummaryDto
+
+    @Select("SELECT * FROM DailyFood")
+    fun getAllDailyFood(): List<Map<String, Any>>
 }

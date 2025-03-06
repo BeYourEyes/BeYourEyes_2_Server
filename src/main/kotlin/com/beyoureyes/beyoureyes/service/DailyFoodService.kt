@@ -61,5 +61,6 @@ class DailyFoodService(
         val today = LocalDate.now().toString()
         return dailyFoodMapper.getNutrientSummaryByDate(userId, today)
     }
+    fun getAllDailyFood() = dailyFoodMapper.getAllDailyFood()
 
 }

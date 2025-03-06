@@ -45,9 +45,15 @@ interface AllergyMapper {
     fun insertAllergy(allergy: Allergy) : Int
 
     @Select("""
-        SELECT * FROM Allergy WHERE user_id = #{userId}
+    SELECT 
+        buckwheat, wheat, soybean, peanut, walnut, 
+        pine_nut, sulfur_dioxide, peach, tomato, 
+        egg, milk, shrimp, mackerel, squid, 
+        crab, shellfish, pork, beef, chicken 
+        FROM Allergy 
+        WHERE user_id = #{userId}
     """)
-    fun getAllergyByUserId(userId : Long) : Allergy?
+    fun getAllergyByUserId(userId: Long): Allergy?
 
     @Update("""
         UPDATE Allergy

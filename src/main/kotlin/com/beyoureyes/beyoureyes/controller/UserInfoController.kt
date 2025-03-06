@@ -153,4 +153,28 @@ class UserInfoController(
             ResponseEntity.ok(ResponseUtil.error("이미 사용 중인 닉네임입니다.", false))
         }
     }
+    @GetMapping("/info")
+    fun getAllUserInfo(): ResponseEntity<ResponseDto<Any>> {
+        val data = userInfoService.getAllUserInfo()
+        return ResponseEntity.ok(ResponseUtil.success("모든 사용자 정보 조회 성공", data))
+    }
+
+//    @PatchMapping("/update")
+//    fun updateUserInfo(@RequestBody request: Map<String, Any>) :ResponseEntity<ResponseDto<Unit>> {
+//        val userId = SecurityContextHolder.getContext().authentication.principal as Long
+//
+//        val userBirth = request["user_birth"] as? String
+//        val userGender = request["user_gender"] as? Int
+//        val userNickname = request["user_nickname"] as? String
+//
+//        val allergyMap = request["allergy"] as? Map<String, Boolean>
+//        val diseaseMap = request["disease"] as? Map<String, Boolean>
+//
+//        return if (userInfoService.updateUserInfo(userId, userBirth, userGender, userNickname, allergyMap, diseaseMap )) {
+//            ResponseEntity.ok(ResponseUtil.success("사용자 정보가 업데이트 되었습니다.", Unit))
+//
+//        } else {
+//            ResponseEntity.status(500).body(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", Unit))
+//        }
+//    }
 }
