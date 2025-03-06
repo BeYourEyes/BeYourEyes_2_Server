@@ -28,19 +28,22 @@ interface DiseaseMapper {
     )
     fun insertDisease(disease: Disease): Int
 
-    @Select(
-        """
-        SELECT * FROM Disease WHERE user_id = #{userId}
-    """
-    )
+    @Select("""
+    SELECT 
+        diabetes, 
+        hypertension, 
+        hyperlipidemia 
+        FROM Disease 
+        WHERE user_id = #{userId}
+    """)
     fun getDiseaseByUserId(userId: Long): Disease?
 
     @Update("""
         UPDATE Disease
         SET
-             diabetes = COALESCE(#{diseaseMap[diabetes]}, diabetes),
-            hypertension = COALESCE(#{diseaseMap[hypertension]}, hypertension),
-            hyperlipidemia = COALESCE(#{diseaseMap[hyperlipidemia]}, hyperlipidemia)
+            diabetes = CASE WHEN #{diseaseMap.diabetes} IS NOT NULL THEN #{diseaseMap.diabetes} ELSE diabetes END,
+            hypertension = CASE WHEN #{diseaseMap.hypertension} IS NOT NULL THEN #{diseaseMap.hypertension} ELSE hypertension END,
+            hyperlipidemia = CASE WHEN #{diseaseMap.hyperlipidemia} IS NOT NULL THEN #{diseaseMap.hyperlipidemia} ELSE hyperlipidemia END
         WHERE user_id = #{userId}
     """)
     fun updateDisease(userId: Long, diseaseMap: Map<String, Boolean>): Int
