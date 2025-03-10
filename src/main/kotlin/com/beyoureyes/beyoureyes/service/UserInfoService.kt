@@ -11,7 +11,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 
 @Service
 class UserInfoService(
@@ -31,6 +32,8 @@ class UserInfoService(
         if (userGender == null || userNickname.isNullOrBlank()) {
             throw IllegalArgumentException("성별과 닉네임은 필수")
         }
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val parsedBirthDate = LocalDate.parse(userBirth, formatter)
 
         val userInfo = UserInfo(
             userId = userId,
@@ -77,19 +80,18 @@ class UserInfoService(
         userId: Long,
         userBirth: String?,
         userGender: Int?,
-        userNickname: String?,
-        allergyMap : Map<String, Boolean>?,
-        diseaseMap : Map<String, Boolean>?
+        userNickname: String?
     ) : Boolean {
-        val updated = userInfoMapper.updateUserInfo(userId, userBirth, userGender, userNickname) > 0
-
-        allergyMap?.let {
-            allergyMapper.updateAllergy(userId, it)
-        }
-        diseaseMap?.let {
-            diseaseMapper.updateDisease(userId, it)
-        }
-
-        return updated
+        // userBirth가 null이 아니면 LocalDate로 변환
+        val formattedBirthDate = userBirth?.let {
+            LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        }?.toString()
+        return userInfoMapper.updateUserInfo(userId, formattedBirthDate, userGender, userNickname) > 0
     }
+
+    fun isNicknameAvaliable(nickname : String): Boolean {
+        return userInfoMapper.countByNickname(nickname) == 0
+    }
+
+    fun getAllUserInfo() = userInfoMapper.getAllUserInfo()
 }

@@ -48,4 +48,10 @@ interface UserMapper {
 
     @Select("SELECT refresh_token FROM user WHERE user_id = #{userId}")
     fun getRefreshToken(userId: Long): String?
+
+    @Delete("DELETE FROM user WHERE user_id = #{userId}")
+    fun deleteUser(userId: Long): Int
+
+    @Select("SELECT * FROM user")
+    fun finalAll() : List<Map<String, Any>>
 }

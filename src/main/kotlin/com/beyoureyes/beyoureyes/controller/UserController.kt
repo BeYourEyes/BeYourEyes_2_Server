@@ -4,14 +4,10 @@ import com.beyoureyes.beyoureyes.dto.LoginRequestDto
 import com.beyoureyes.beyoureyes.dto.ResponseDto
 import com.beyoureyes.beyoureyes.service.UserService
 import com.beyoureyes.beyoureyes.utils.ResponseUtil
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.ExampleObject
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -57,4 +53,21 @@ class UserController(private val userService: UserService) {
             ResponseEntity.badRequest().body(ResponseUtil.error("토큰이 유효하지 않습니다.", ""))
         }
     }
+
+    @DeleteMapping("/delete")
+    fun deleteUser(): ResponseEntity<ResponseDto<Unit>> {
+        val userId = SecurityContextHolder.getContext().authentication.principal as Long
+        return if( userService.deleteUser(userId)) {
+            ResponseEntity.ok(ResponseUtil.success("사용자 계정이 삭제되었습니다.", Unit))
+        } else {
+            ResponseEntity.ok(ResponseUtil.error("사용자 계정 삭제 실패", Unit))
+        }
+    }
+
+    @GetMapping("/users")
+    fun getAllUsers(): ResponseEntity<ResponseDto<Any>> {
+        val data = userService.getAllUsers()
+        return ResponseEntity.ok(ResponseUtil.success("모든 사용자 데이터 조회 성공", data))
+    }
+
 }

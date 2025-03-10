@@ -25,8 +25,9 @@ class SecurityConfig(private val jwtUtil: JwtUtil) {
             .authorizeHttpRequests {
                 it
                     .requestMatchers("/", "/user/login", "/user/verify-token", "/user/save-user").permitAll()
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                    .requestMatchers("/user/user-info", "/user/update").authenticated()
+                    .requestMatchers("/update/allergy/allergy", "/food/daily-food", "/update/disease/disease", "/user/users", "/user/info").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/user/check-nickname").permitAll()
+                    .requestMatchers("/user/user-info", "/user/update", "/update/disease", "/update/allergy").authenticated()
                     .requestMatchers("/food/record", "/food/today", "/food/today/summary").authenticated()
                     .anyRequest().permitAll()
             }

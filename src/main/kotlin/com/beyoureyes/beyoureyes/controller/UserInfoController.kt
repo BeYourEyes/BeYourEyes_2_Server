@@ -119,22 +119,57 @@ class UserInfoController(
         return ResponseEntity.ok(ResponseUtil.success("사용자 정보 조회 성공했습니다.", responseData))
     }
 
-    @PatchMapping("/update")
-    fun updateUserInfo(@RequestBody request: Map<String, Any>) :ResponseEntity<ResponseDto<Unit>> {
+    @PatchMapping("/update/user-info")
+    fun updateUserInfo2(@RequestBody request : Map<String, Any>): ResponseEntity<ResponseDto<Unit>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
-
         val userBirth = request["user_birth"] as? String
         val userGender = request["user_gender"] as? Int
         val userNickname = request["user_nickname"] as? String
 
-        val allergyMap = request["allergy"] as? Map<String, Boolean>
-        val diseaseMap = request["disease"] as? Map<String, Boolean>
-
-        return if (userInfoService.updateUserInfo(userId, userBirth, userGender, userNickname, allergyMap, diseaseMap )) {
+        return if (userInfoService.updateUserInfo(userId, userBirth, userGender, userNickname)) {
             ResponseEntity.ok(ResponseUtil.success("사용자 정보가 업데이트 되었습니다.", Unit))
-
         } else {
-            ResponseEntity.status(500).body(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", Unit))
+            ResponseEntity.ok(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", Unit))
+        }
+
+    }
+
+    @GetMapping("/check-nickname")
+    fun checkNickname(@RequestParam nickname: String): ResponseEntity<ResponseDto<Boolean>> {
+        if (nickname.isBlank()) {
+            return ResponseEntity.badRequest().body(ResponseUtil.error("닉네임이 필요합니다.", false))
+        }
+
+        val isAvailable = userInfoService.isNicknameAvaliable(nickname)
+
+        return if (isAvailable) {
+            ResponseEntity.ok(ResponseUtil.success("사용 가능한 닉네임입니다.", true))
+        } else {
+            ResponseEntity.ok(ResponseUtil.error("이미 사용 중인 닉네임입니다.", false))
         }
     }
+    @GetMapping("/info")
+    fun getAllUserInfo(): ResponseEntity<ResponseDto<Any>> {
+        val data = userInfoService.getAllUserInfo()
+        return ResponseEntity.ok(ResponseUtil.success("모든 사용자 정보 조회 성공", data))
+    }
+
+//    @PatchMapping("/update")
+//    fun updateUserInfo(@RequestBody request: Map<String, Any>) :ResponseEntity<ResponseDto<Unit>> {
+//        val userId = SecurityContextHolder.getContext().authentication.principal as Long
+//
+//        val userBirth = request["user_birth"] as? String
+//        val userGender = request["user_gender"] as? Int
+//        val userNickname = request["user_nickname"] as? String
+//
+//        val allergyMap = request["allergy"] as? Map<String, Boolean>
+//        val diseaseMap = request["disease"] as? Map<String, Boolean>
+//
+//        return if (userInfoService.updateUserInfo(userId, userBirth, userGender, userNickname, allergyMap, diseaseMap )) {
+//            ResponseEntity.ok(ResponseUtil.success("사용자 정보가 업데이트 되었습니다.", Unit))
+//
+//        } else {
+//            ResponseEntity.status(500).body(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", Unit))
+//        }
+//    }
 }

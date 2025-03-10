@@ -58,4 +58,10 @@ class DailyFoodController(
         val nutrientSummary = dailyFoodService.getTodayNutrientSummary(userId)
         return ResponseEntity.ok(ResponseUtil.success("오늘 섭취한 총 영양소 조회 성공", nutrientSummary))
     }
+
+    @GetMapping("/daily-food")
+    fun getAllDailyFood(): ResponseEntity<ResponseDto<Any>> {
+        val data = dailyFoodService.getAllDailyFood()
+        return ResponseEntity.ok(ResponseUtil.success("모든 일일 섭취 음식 데이터 조회 성공", data))
+    }
 }
