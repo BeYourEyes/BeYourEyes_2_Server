@@ -1,11 +1,11 @@
 package com.beyoureyes.beyoureyes.entity
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class UserInfo (
     val userInfoId : Long? = null,
     val userId : Long,
-    val userBirth : LocalDateTime,
+    val userBirth : LocalDate,
     val userGender : Int,
     val userNickname : String
 )

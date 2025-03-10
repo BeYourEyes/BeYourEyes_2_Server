@@ -104,7 +104,7 @@ class UserInfoController(
         val userId = SecurityContextHolder.getContext().authentication.principal.toString().toLong()
 
 
-        val (userInfo, allergy, disease) = userInfoService.getUserDetails(userId)
+        val (userInfo, allergyData, diseaseData) = userInfoService.getUserDetails(userId)
 
         if (userInfo == null) {
             return ResponseEntity.status(404).body(ResponseUtil.error("사용자 정보가 없습니다.", emptyMap()))
@@ -112,8 +112,8 @@ class UserInfoController(
 
         val responseData: Map<String, Any?> = mapOf(
             "userInfo" to userInfo,
-            "allergy" to allergy,
-            "disease" to disease
+            "allergy" to allergyData,
+            "disease" to diseaseData
         )
 
         return ResponseEntity.ok(ResponseUtil.success("사용자 정보 조회 성공했습니다.", responseData))
