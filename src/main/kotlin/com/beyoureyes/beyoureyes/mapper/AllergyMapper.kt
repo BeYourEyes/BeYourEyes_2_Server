@@ -53,7 +53,7 @@ interface AllergyMapper {
         FROM Allergy 
         WHERE user_id = #{userId}
     """)
-    fun getAllergyByUserId(userId: Long): Allergy?
+    fun getAllergyByUserId(userId: Long): Allergy? // 수정 필요
 
     @Update("""
         UPDATE Allergy
