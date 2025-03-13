@@ -1,0 +1,26 @@
+name: Deploy to Mini PC
+
+on:
+  workflow_run:
+    workflows: ["Build & Push to Docker Hub"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Mini PC (via SSH)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -i private_key.pem -o StrictHostKeyChecking=no soojin@$SERVER_IP "
+            docker stop spring-beyour || true &&
+            docker rm spring-beyour || true &&
+            docker pull $DOCKER_HUB_USERNAME/beyour-app:latest &&
+            docker run -d -p 8080:8080 --name spring-beyour -e DB_URL=$DB_URL -e DB_USERNAME=$DB_USERNAME -e DB_PASSWORD=$DB_PASSWORD -e FIREBASE_CONFIG=$FIREBASE_CONFIG $DOCKER_HUB_USERNAME/beyour-app:latest
+          "
