@@ -5,6 +5,7 @@ on:
     workflows: ["Build & Push to Docker Hub"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,7 +19,7 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
-          ssh -i private_key.pem -o StrictHostKeyChecking=no soojin@$SERVER_IP "
+          ssh -i private_key.pem -o StrictHostKeyChecking=no -p 234 soojin@$SERVER_IP "
             docker stop spring-beyour || true &&
             docker rm spring-beyour || true &&
             docker pull $DOCKER_HUB_USERNAME/beyour-app:latest &&
