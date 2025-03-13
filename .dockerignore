@@ -1,0 +1,8 @@
+# Gradle & Kotlin 빌드 파일 제외
+*.jar
+*.war
+*.iml
+.gradle
+/target
+/.mvn
+/.idea
