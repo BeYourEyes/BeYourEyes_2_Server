@@ -3,10 +3,11 @@ name: Build & Deploy Spring Boot to Mini PC
 on:
   push:
     branches:
-      - main  # main 브랜치에 Push하면 실행됨
+      - main  # main 브랜치에 Push하면 실행됨!
+  workflow_dispatch:  # 직접 실행 가능하도록 추가
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,11 +21,6 @@ jobs:
           java-version: '21'
 
       - name: Build Project with Gradle
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
@@ -46,6 +42,11 @@ jobs:
           docker build -t $DOCKER_HUB_USERNAME/beyour-app:latest .
           docker push $DOCKER_HUB_USERNAME/beyour-app:latest
 
+  deploy:
+    needs: build  # Build가 끝난 후 자동으로 실행됨!
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Deploy to Mini PC (via SSH)
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
