@@ -20,19 +20,28 @@ jobs:
       - name: 📂 Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🔐 Login to Docker Hub
-        uses: docker/login-action@v2
+      - name: 🔧 Set up JDK 21
+        uses: actions/setup-java@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          distribution: 'temurin'
+          java-version: '21'
 
-      - name: 🏗️ Build Docker Image
+      - name: 🏗️ Build Project with Gradle
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_NAME }} .
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: 📂 Check if JAR file exists
+        run: ls -lh build/libs  # ✅ JAR 파일이 정상적으로 생성되었는지 확인!
+
+      - name: 📦 Rename JAR File
+        run: |
+          mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
 
       - name: 📤 Push Docker Image to Docker Hub
         run: |
-          docker push ${{ env.DOCKER_IMAGE_NAME }}
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app
 
   deploy-to-ubuntu-server:
     name: Deploy to Mini PC
