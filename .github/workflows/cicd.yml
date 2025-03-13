@@ -3,8 +3,8 @@ name: Build & Deploy Spring Boot to Mini PC
 on:
   push:
     branches:
-      - main  # main 브랜치에 Push하면 실행됨!
-  workflow_dispatch:  # 직접 실행 가능하도록 추가
+      - main  # ✅ main 브랜치에 Push하면 실행됨!
+  workflow_dispatch:  # ✅ 직접 실행 가능하도록 추가
 
 jobs:
   build:
@@ -43,6 +43,7 @@ jobs:
           docker push $DOCKER_HUB_USERNAME/beyour-app:latest
 
   deploy:
+    needs: build  # Build 완료 후 실행됨!
     runs-on: ubuntu-latest
 
     steps:
@@ -52,16 +53,19 @@ jobs:
       - name: SSH Deploy to Mini PC
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: ${{ secrets.SERVER_IP }}   # 미니 PC의 IP 
+          host: ${{ secrets.SERVER_IP }}   # 미니 PC의 IP
           username: soojin
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 개인 키
-          port: 234  # SSH 포트 (234)
+          port: 234  # SSH 포트
           timeout: 40s  # 40초 타임아웃 설정
           script: |
             echo "✅ Successfully connected to Mini PC!"
             docker stop spring-beyour || true
             docker rm spring-beyour || true
-            docker pull $DOCKER_HUB_USERNAME/beyour-app:latest
-            docker run -d -p 8080:8080 --name spring-beyour -e DB_URL=$DB_URL -e DB_USERNAME=$DB_USERNAME -e DB_PASSWORD=$DB_PASSWORD -e FIREBASE_CONFIG=$FIREBASE_CONFIG $DOCKER_HUB_USERNAME/beyour-app:latest
-          
-
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
+            docker run -d -p 8080:8080 --name spring-beyour \
+              -e DB_URL=${{ secrets.DB_URL }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }} \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
