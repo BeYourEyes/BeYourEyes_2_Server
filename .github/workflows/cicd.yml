@@ -47,6 +47,9 @@ jobs:
       - name: Repository Checkout
         uses: actions/checkout@v3
 
+      - name: Check GitHub Actions Runner Public IP
+        run: curl ifconfig.me  # CI/CD 실행 환경의 공용 IP 확인
+
       - name: SSH Deploy to Mini PC
         uses: appleboy/ssh-action@v0.1.5
         with:
