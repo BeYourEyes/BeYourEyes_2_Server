@@ -1,0 +1,70 @@
+
+name: Build & Deploy Spring Boot to Mini PC
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 Push하면 실행됨!
+  workflow_dispatch: 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build Project with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+      - name: Rename JAR File
+        run: |
+          ls -lh build/libs  # 빌드된 JAR 파일 목록 확인
+          mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build & Push Docker Image to Docker Hub
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        run: |
+          echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+          docker build -t $DOCKER_HUB_USERNAME/beyour-app:latest .
+          docker push $DOCKER_HUB_USERNAME/beyour-app:latest
+  deploy:
+    needs: build  # Build 완료 후 실행됨!
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository Checkout
+        uses: actions/checkout@v3
+
+      - name: Check GitHub Actions Runner Public IP
+        run: curl ifconfig.me  # CI/CD 실행 환경의 공용 IP 확인
+
+      - name: SSH Deploy & Run
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: soojin
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 234
+          script: |
+            echo "✅ Successfully connected to Mini PC!"
+            docker stop spring-beyour || true
+            docker rm spring-beyour || true
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
+            docker run -d -p 8080:8080 --name spring-beyour \
+              -e DB_URL=${{ secrets.DB_URL }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }} \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
