@@ -63,5 +63,5 @@ jobs:
             docker rm spring-beyour || true
             docker pull $DOCKER_HUB_USERNAME/beyour-app:latest
             docker run -d -p 8080:8080 --name spring-beyour -e DB_URL=$DB_URL -e DB_USERNAME=$DB_USERNAME -e DB_PASSWORD=$DB_PASSWORD -e FIREBASE_CONFIG=$FIREBASE_CONFIG $DOCKER_HUB_USERNAME/beyour-app:latest
-          "
+          
 
