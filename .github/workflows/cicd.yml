@@ -52,8 +52,8 @@ jobs:
       - name: SSH Deploy to Mini PC
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: ${{ secrets.HOST }}   # 미니 PC의 IP (예: 211.193.51.85)
-          username: ${{ secrets.USERNAME }}  # SSH 접속 사용자 (예: soojin)
+          host: ${{ secrets.SERVER_IP }}   # 미니 PC의 IP 
+          username: soojin
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 개인 키
           port: 234  # SSH 포트 (234)
           timeout: 40s  # 40초 타임아웃 설정
