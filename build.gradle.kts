@@ -22,6 +22,12 @@ configurations {
 	}
 }
 
+tasks.jar {
+	manifest {
+		attributes["Main-Class"] = "com.beyoureyes.beyoureyes.Application"
+	}
+}
+
 repositories {
 	mavenCentral()
 }
