@@ -1,12 +1,12 @@
-name: Build & Push to Docker Hub
+name: Build & Deploy Spring Boot to Mini PC
 
 on:
   push:
     branches:
-      - main  # main 브랜치에 Push하면 실행됨!
+      - main  # main 브랜치에 Push하면 실행됨
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,3 +45,17 @@ jobs:
           echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
           docker build -t $DOCKER_HUB_USERNAME/beyour-app:latest .
           docker push $DOCKER_HUB_USERNAME/beyour-app:latest
+
+      - name: Deploy to Mini PC (via SSH)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -i private_key.pem -o StrictHostKeyChecking=no -p 234 soojin@$SERVER_IP "
+            docker stop spring-beyour || true &&
+            docker rm spring-beyour || true &&
+            docker pull $DOCKER_HUB_USERNAME/beyour-app:latest &&
+            docker run -d -p 8080:8080 --name spring-beyour -e DB_URL=$DB_URL -e DB_USERNAME=$DB_USERNAME -e DB_PASSWORD=$DB_PASSWORD -e FIREBASE_CONFIG=$FIREBASE_CONFIG $DOCKER_HUB_USERNAME/beyour-app:latest
+          "
