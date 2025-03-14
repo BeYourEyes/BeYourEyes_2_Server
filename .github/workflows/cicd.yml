@@ -1,11 +1,11 @@
-
 name: Build & Deploy Spring Boot to Mini PC
 
 on:
   push:
     branches:
       - main  # main 브랜치에 Push하면 실행됨!
-  workflow_dispatch: 
+  workflow_dispatch:  # 수동 실행 가능
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,10 +24,12 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
+          
       - name: Rename JAR File
         run: |
           ls -lh build/libs  # 빌드된 JAR 파일 목록 확인
           mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
+          
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -39,6 +41,7 @@ jobs:
           echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
           docker build -t $DOCKER_HUB_USERNAME/beyour-app:latest .
           docker push $DOCKER_HUB_USERNAME/beyour-app:latest
+
   deploy:
     needs: build  # Build 완료 후 실행됨!
     runs-on: ubuntu-latest
@@ -49,6 +52,23 @@ jobs:
 
       - name: Check GitHub Actions Runner Public IP
         run: curl ifconfig.me  # CI/CD 실행 환경의 공용 IP 확인
+
+      - name: Debug SSH Connection Details
+        run: |
+          echo "🔍 SSH Connection Debug Info"
+          echo "Host: ${{ secrets.SERVER_IP }}"
+          echo "Username: soojin"
+          echo "Port: 234"
+
+      - name: Set Up SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Test SSH Connection
+        run: |
+          ssh -vvv -i ~/.ssh/id_rsa -p 234 soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
 
       - name: SSH Deploy & Run
         uses: appleboy/ssh-action@master
