@@ -43,48 +43,41 @@ jobs:
           docker push $DOCKER_HUB_USERNAME/beyour-app:latest
 
   deploy:
-    needs: build  # Build 완료 후 실행됨!
-    runs-on: ubuntu-latest
+      needs: build
+      runs-on: ubuntu-latest
+  
+      steps:
+        - name: Repository Checkout
+          uses: actions/checkout@v3
+  
+        - name: Check GitHub Actions Runner Public IP
+          run: curl ifconfig.me
+  
+        - name: Add SSH Host Key to Known Hosts
+          run: |
+            mkdir -p ~/.ssh
+            ssh-keyscan -p 234 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+  
+        - name: Test SSH Connection
+          run: |
+            ssh -o StrictHostKeyChecking=no -vvv -i ~/.ssh/id_rsa -p 234 soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
+  
+        - name: SSH Deploy & Run
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.SERVER_IP }}
+            username: soojin
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            port: 234
+            script: |
+              echo "✅ Successfully connected to Mini PC!"
+              docker stop spring-beyour || true
+              docker rm spring-beyour || true
+              docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
+              docker run -d -p 8080:8080 --name spring-beyour \
+                -e DB_URL=${{ secrets.DB_URL }} \
+                -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+                -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                -e FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }} \
+                ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
 
-    steps:
-      - name: Repository Checkout
-        uses: actions/checkout@v3
-
-      - name: Check GitHub Actions Runner Public IP
-        run: curl ifconfig.me  # CI/CD 실행 환경의 공용 IP 확인
-
-      - name: Debug SSH Connection Details
-        run: |
-          echo "🔍 SSH Connection Debug Info"
-          echo "Host: ${{ secrets.SERVER_IP }}"
-          echo "Username: soojin"
-          echo "Port: 234"
-
-      - name: Set Up SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Test SSH Connection
-        run: |
-          ssh -vvv -i ~/.ssh/id_rsa -p 234 soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
-
-      - name: SSH Deploy & Run
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: soojin
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 234
-          script: |
-            echo "✅ Successfully connected to Mini PC!"
-            docker stop spring-beyour || true
-            docker rm spring-beyour || true
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
-            docker run -d -p 8080:8080 --name spring-beyour \
-              -e DB_URL=${{ secrets.DB_URL }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }} \
-              ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
