@@ -43,41 +43,51 @@ jobs:
           docker push $DOCKER_HUB_USERNAME/beyour-app:latest
 
   deploy:
-      needs: build
-      runs-on: ubuntu-latest
-  
-      steps:
-        - name: Repository Checkout
-          uses: actions/checkout@v3
-  
-        - name: Check GitHub Actions Runner Public IP
-          run: curl ifconfig.me
-  
-        - name: Add SSH Host Key to Known Hosts
-          run: |
-            mkdir -p ~/.ssh
-            ssh-keyscan -p 234 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-  
-        - name: Test SSH Connection
-          run: |
-            ssh -o StrictHostKeyChecking=no -vvv -i ~/.ssh/id_rsa -p 234 soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
-  
-        - name: SSH Deploy & Run
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{ secrets.SERVER_IP }}
-            username: soojin
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
-            port: 234
-            script: |
-              echo "✅ Successfully connected to Mini PC!"
-              docker stop spring-beyour || true
-              docker rm spring-beyour || true
-              docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
-              docker run -d -p 8080:8080 --name spring-beyour \
-                -e DB_URL=${{ secrets.DB_URL }} \
-                -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-                -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                -e FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }} \
-                ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
+    needs: build
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Repository Checkout
+        uses: actions/checkout@v3
+
+      - name: Check GitHub Actions Runner Public IP
+        run: curl ifconfig.me
+
+      - name: Set Up SSH Key (id_rsa_github_actions)
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_github_actions
+          chmod 600 ~/.ssh/id_rsa_github_actions
+
+      - name: Add SSH Host Key to Known Hosts
+        run: |
+          ssh-keyscan -p 234 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Debug SSH Key Storage
+        run: |
+          echo "🔍 Checking stored SSH keys..."
+          ls -l ~/.ssh
+          cat ~/.ssh/id_rsa_github_actions | head -n 5  # 첫 5줄만 출력 (보안상 문제 없음)
+
+      - name: Test SSH Connection (Using id_rsa_github_actions)
+        run: |
+          ssh -o StrictHostKeyChecking=no -vvv -i ~/.ssh/id_rsa_github_actions -p 234 soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
+
+      - name: SSH Deploy & Run
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: soojin
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 234
+          script: |
+            echo "✅ Successfully connected to Mini PC!"
+            docker stop spring-beyour || true
+            docker rm spring-beyour || true
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
+            docker run -d -p 8080:8080 --name spring-beyour \
+              -e DB_URL=${{ secrets.DB_URL }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }} \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
