@@ -14,4 +14,9 @@ object ResponseUtil {
     fun <T> error(message : String, data : T) : ResponseDto<T> {
         return ResponseDto(ResponseStatus.ERROR, message, data)
     }
+
+    fun <T> no_data(message : String, data : T) : ResponseDto<T> {
+        return ResponseDto(ResponseStatus.NO_DATA, message, data)
+    }
+
 }

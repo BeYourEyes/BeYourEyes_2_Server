@@ -5,6 +5,7 @@ import com.beyoureyes.beyoureyes.entity.User
 import com.beyoureyes.beyoureyes.jwt.JwtUtil
 import com.beyoureyes.beyoureyes.mapper.UserMapper
 import com.beyoureyes.beyoureyes.utils.ResponseUtil
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.crypto.bcrypt.BCrypt
@@ -19,25 +20,26 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
         println("1년 이상 로그인하지 않은 사용자 $affectedRows 명 비활성화 되었습니다.")
     }
 
+    // v2/user/login : DB에 deviceId가 저장되어있는지 확인
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
-        val users = userMapper.findAll() // 모든 유저를 조회하여 비교
+        val users = userMapper.findAll()
 
-        // 저장된 유저들 중에서 device_id가 일치하는 유저를 찾음
         val user = users.find { BCrypt.checkpw(deviceId, it.deviceId) }
 
-        // device_id가 없는 경우
         if (user == null) {
-            return ResponseEntity.ok(ResponseUtil.error("존재하지 않는 사용자입니다. 정보 저장이 필요합니다.", null))
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ResponseUtil.no_data("존재하지 않는 사용자입니다. 정보 저장이 필요합니다.", null))
         }
 
         val accessToken = jwtUtil.generateAccessToken(user.userId!!)
         val refreshToken = jwtUtil.generateRefreshToken(user.userId)
 
-        // 리프레시 토큰 DB에 저장
         userMapper.updateRefreshToken(user.userId, refreshToken)
 
         return ResponseEntity.ok(ResponseUtil.success("로그인 성공", accessToken))
     }
+
 
     fun refreshAccessToken(accessToken: String): String? {
         // 만료된 Access Token에서도 사용자 ID를 추출할 수 있어야 함

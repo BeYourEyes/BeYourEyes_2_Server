@@ -22,8 +22,6 @@ class UserController(private val userService: UserService) {
         if (deviceId.isBlank()) {
             return ResponseEntity.badRequest().body(ResponseUtil.error("device_id가 빈값입니다.", null))
         }
-
-        // UserService에서 직접 ResponseEntity를 반환하도록 수정
         return userService.login(deviceId)
     }
 
