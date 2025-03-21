@@ -66,7 +66,8 @@ dependencies {
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
 
-
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
 }
 

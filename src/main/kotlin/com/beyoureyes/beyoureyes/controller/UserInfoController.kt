@@ -92,8 +92,6 @@ class UserInfoController(
     }
 
 
-
-
     @GetMapping("/user-info")
     fun getUserInfo(): ResponseEntity<ResponseDto<Map<String, Any?>>> {
         // JWT 필터를 통해 인증된 사용자 ID 가져오기
