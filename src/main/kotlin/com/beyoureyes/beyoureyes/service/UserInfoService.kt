@@ -63,10 +63,25 @@ class UserInfoService(
         // allergy에서 true인 값만 필터링 후 AllergyDto로 변환
         val allergyData = allergy?.let {
             mapOf(
+                "buckwheat" to it.buckwheat,
+                "wheat" to it.wheat,
+                "soybean" to it.soybean,
                 "peanut" to it.peanut,
+                "walnut" to it.walnut,
+                "pineNut" to it.pineNut,
+                "sulfurDioxide" to it.sulfurDioxide,
+                "peach" to it.peach,
+                "tomato" to it.tomato,
+                "egg" to it.egg,
                 "milk" to it.milk,
                 "shrimp" to it.shrimp,
-                // 여기서 나머지 알레르기 항목들도 필터링해서 추가
+                "mackerel" to it.mackerel,
+                "squid" to it.squid,
+                "crab" to it.crab,
+                "shellfish" to it.shellfish,
+                "pork" to it.pork,
+                "beef" to it.beef,
+                "chicken" to it.chicken
             ).filterValues { value -> value == true } // true인 값만 필터링
         } ?: emptyMap()
 
@@ -90,6 +105,7 @@ class UserInfoService(
             disease = diseaseData   // true인 질환 항목만 포함
         )
     }
+
 
     @Transactional
     fun updateUserInfo(
