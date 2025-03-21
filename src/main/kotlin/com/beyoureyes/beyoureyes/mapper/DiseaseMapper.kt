@@ -39,14 +39,22 @@ interface DiseaseMapper {
     fun getDiseaseByUserId(userId: Long): Disease?
 
     @Update("""
-        UPDATE Disease
-        SET
-            diabetes = CASE WHEN #{diseaseMap.diabetes} IS NOT NULL THEN #{diseaseMap.diabetes} ELSE diabetes END,
-            hypertension = CASE WHEN #{diseaseMap.hypertension} IS NOT NULL THEN #{diseaseMap.hypertension} ELSE hypertension END,
-            hyperlipidemia = CASE WHEN #{diseaseMap.hyperlipidemia} IS NOT NULL THEN #{diseaseMap.hyperlipidemia} ELSE hyperlipidemia END
-        WHERE user_id = #{userId}
-    """)
+            UPDATE Disease
+            SET
+                diabetes = CASE WHEN #{diseaseMap[diabetes]} IS TRUE AND diabetes = FALSE THEN TRUE 
+                                WHEN #{diseaseMap[diabetes]} IS FALSE AND diabetes = TRUE THEN FALSE
+                                ELSE diabetes END,
+                hypertension = CASE WHEN #{diseaseMap[hypertension]} IS TRUE AND hypertension = FALSE THEN TRUE
+                                    WHEN #{diseaseMap[hypertension]} IS FALSE AND hypertension = TRUE THEN FALSE
+                                    ELSE hypertension END,
+                hyperlipidemia = CASE WHEN #{diseaseMap[hyperlipidemia]} IS TRUE AND hyperlipidemia = FALSE THEN TRUE
+                                      WHEN #{diseaseMap[hyperlipidemia]} IS FALSE AND hyperlipidemia = TRUE THEN FALSE
+                                      ELSE hyperlipidemia END
+            WHERE user_id = #{userId}
+        """)
     fun updateDisease(userId: Long, diseaseMap: Map<String, Boolean>): Int
+
+
 
     @Select("SELECT * FROM Disease")
     fun getAllDisease(): List<Map<String, Any>>
