@@ -1,11 +1,11 @@
-
 name: Build & Deploy Spring Boot to Mini PC
 
 on:
   push:
     branches:
       - main  # main 브랜치에 Push하면 실행됨!
-  workflow_dispatch: 
+  workflow_dispatch:  # 수동 실행 가능
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,10 +24,12 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
+          
       - name: Rename JAR File
         run: |
           ls -lh build/libs  # 빌드된 JAR 파일 목록 확인
           mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
+          
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -39,8 +41,9 @@ jobs:
           echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
           docker build -t $DOCKER_HUB_USERNAME/beyour-app:latest .
           docker push $DOCKER_HUB_USERNAME/beyour-app:latest
+
   deploy:
-    needs: build  # Build 완료 후 실행됨!
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -48,7 +51,27 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check GitHub Actions Runner Public IP
-        run: curl ifconfig.me  # CI/CD 실행 환경의 공용 IP 확인
+        run: curl ifconfig.me
+
+      - name: Set Up SSH Key (id_rsa_github_actions)
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_github_actions
+          chmod 600 ~/.ssh/id_rsa_github_actions
+
+      - name: Add SSH Host Key to Known Hosts
+        run: |
+          ssh-keyscan -p 234 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Debug SSH Key Storage
+        run: |
+          echo "🔍 Checking stored SSH keys..."
+          ls -l ~/.ssh
+          cat ~/.ssh/id_rsa_github_actions | head -n 5  # 첫 5줄만 출력 (보안상 문제 없음)
+
+      - name: Test SSH Connection (Using id_rsa_github_actions)
+        run: |
+          ssh -o StrictHostKeyChecking=no -vvv -i ~/.ssh/id_rsa_github_actions -p 234 soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
 
       - name: SSH Deploy & Run
         uses: appleboy/ssh-action@master
