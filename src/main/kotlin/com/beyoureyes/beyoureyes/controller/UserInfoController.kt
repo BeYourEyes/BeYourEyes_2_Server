@@ -1,14 +1,18 @@
 package com.beyoureyes.beyoureyes.controller
 
 import com.beyoureyes.beyoureyes.dto.ResponseDto
+import com.beyoureyes.beyoureyes.dto.SaveUserRequestDto
 import com.beyoureyes.beyoureyes.entity.Allergy
 import com.beyoureyes.beyoureyes.entity.Disease
 import com.beyoureyes.beyoureyes.jwt.JwtUtil
 import com.beyoureyes.beyoureyes.service.UserInfoService
 import com.beyoureyes.beyoureyes.service.UserService
 import com.beyoureyes.beyoureyes.utils.ResponseUtil
+import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 /* -
@@ -21,81 +25,73 @@ import org.springframework.web.bind.annotation.*
 * 안드로이드 로컬 저장소 토큰을 저장 - 0
 * */
 @RestController
+@Validated
 @RequestMapping("/user")
 class UserInfoController(
     private val userInfoService: UserInfoService,
     private val userService: UserService,
     private val jwtUtil: JwtUtil
 ) {
-
     @PostMapping("/save-user")
-    fun saveUserInfo(@RequestBody request: Map<String, Any>): ResponseEntity<out ResponseDto<out String?>> {
-        val deviceId = request["device_id"] as? String
-            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("device_id가 필요합니다.", null))
+    fun saveUserInfo(@Valid @RequestBody request: SaveUserRequestDto): ResponseEntity<out ResponseDto<out String?>> {
+        val userId = userService.createUser(request.device_id)
+            ?: return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ResponseUtil.error("사용자 생성 실패", null))
 
-        val userBirth = request["user_birth"] as? String
-            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("생년월일이 필요합니다.", null))
-
-        val userGender = request["user_gender"] as? Int
-            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("성별이 필요합니다.", null))
-
-        val userNickname = request["user_nickname"] as? String
-            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("닉네임이 필요합니다.", null))
-
-        val allergyMap = request["allergy"] as? Map<String, Boolean>
-            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("알러지 정보가 필요합니다.", null))
-
-        val diseaseMap = request["disease"] as? Map<String, Boolean>
-            ?: return ResponseEntity.badRequest().body(ResponseUtil.error("질환 정보가 필요합니다.", null))
-
-        // 1. 유저 생성 및 user_id 가져오기
-        val userId = userService.createUser(deviceId)
-            ?: return ResponseEntity.status(500).body(ResponseUtil.error("사용자 생성 실패", null))
-
-        // 2. 알러지 및 질환 데이터 매핑
         val allergy = Allergy(
             userId = userId,
-            buckwheat = allergyMap["buckwheat"] ?: false,
-            wheat = allergyMap["wheat"] ?: false,
-            soybean = allergyMap["soybean"] ?: false,
-            peanut = allergyMap["peanut"] ?: false,
-            walnut = allergyMap["walnut"] ?: false,
-            pineNut = allergyMap["pineNut"] ?: false,
-            sulfurDioxide = allergyMap["sulfurDioxide"] ?: false,
-            peach = allergyMap["peach"] ?: false,
-            tomato = allergyMap["tomato"] ?: false,
-            egg = allergyMap["egg"] ?: false,
-            milk = allergyMap["milk"] ?: false,
-            shrimp = allergyMap["shrimp"] ?: false,
-            mackerel = allergyMap["mackerel"] ?: false,
-            squid = allergyMap["squid"] ?: false,
-            crab = allergyMap["crab"] ?: false,
-            shellfish = allergyMap["shellfish"] ?: false,
-            pork = allergyMap["pork"] ?: false,
-            beef = allergyMap["beef"] ?: false,
-            chicken = allergyMap["chicken"] ?: false
+            buckwheat = request.allergy.buckwheat,
+            wheat = request.allergy.wheat,
+            soybean = request.allergy.soybean,
+            peanut = request.allergy.peanut,
+            walnut = request.allergy.walnut,
+            pineNut = request.allergy.pineNut,
+            sulfurDioxide = request.allergy.sulfurDioxide,
+            peach = request.allergy.peach,
+            tomato = request.allergy.tomato,
+            egg = request.allergy.egg,
+            milk = request.allergy.milk,
+            shrimp = request.allergy.shrimp,
+            mackerel = request.allergy.mackerel,
+            squid = request.allergy.squid,
+            crab = request.allergy.crab,
+            shellfish = request.allergy.shellfish,
+            pork = request.allergy.pork,
+            beef = request.allergy.beef,
+            chicken = request.allergy.chicken
         )
 
         val disease = Disease(
             userId = userId,
-            diabetes = diseaseMap["diabetes"] ?: false,
-            hypertension = diseaseMap["hypertension"] ?: false,
-            hyperlipidemia = diseaseMap["hyperlipidemia"] ?: false
+            diabetes = request.disease.diabetes,
+            hypertension = request.disease.hypertension,
+            hyperlipidemia = request.disease.hyperlipidemia
         )
 
-        // 3. 사용자 정보 저장
-        if (userInfoService.saveUserInfo(userId, userBirth, userGender, userNickname, allergy, disease)) {
-            val accessToken = jwtUtil.generateAccessToken(userId)
-            val refreshToken = jwtUtil.generateRefreshToken(userId)
+        val saved = userInfoService.saveUserInfo(
+            userId = userId,
+            userBirth = request.user_birth,
+            userGender = request.user_gender,
+            userNickname = request.user_nickname,
+            allergy = allergy,
+            disease = disease
+        )
 
-            // Refresh Token을 DB에 저장
-            userService.updateRefreshToken(userId, refreshToken)
-
-            return ResponseEntity.ok(ResponseUtil.success("사용자 정보가 저장되었습니다.", accessToken))
-        } else {
-            return ResponseEntity.status(500).body(ResponseUtil.error("사용자 정보 저장 실패", null))
+        if (!saved) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ResponseUtil.error("사용자 정보 저장 실패", null))
         }
+
+        val accessToken = jwtUtil.generateAccessToken(userId)
+        val refreshToken = jwtUtil.generateRefreshToken(userId)
+        userService.updateRefreshToken(userId, refreshToken)
+
+        return ResponseEntity.ok(ResponseUtil.success("사용자 정보가 저장되었습니다.", accessToken))
     }
+
+
 
 
     @GetMapping("/user-info")
