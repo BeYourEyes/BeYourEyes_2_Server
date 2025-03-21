@@ -1,6 +1,6 @@
 package com.beyoureyes.beyoureyes.entity
 
-data class Disease (
+data class Disease @JvmOverloads constructor(
     val diseaseId : Long? = null,
     val userId : Long,
     val diabetes : Boolean = false, // 당뇨병
