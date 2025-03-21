@@ -15,6 +15,6 @@ class GlobalExceptionHandler {
         e.printStackTrace()
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ResponseUtil.error("예상치 못한 에러가 발생했습니다.", null))
+            .body(ResponseUtil.error("서버 오류가 발생했습니다.", null))
     }
 }
