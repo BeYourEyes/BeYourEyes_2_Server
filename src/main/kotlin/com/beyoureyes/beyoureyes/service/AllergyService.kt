@@ -10,7 +10,7 @@ class AllergyService (
 ) {
 
     @Transactional
-    fun updateAllergyInfo (userId : Long, allergyMap: Map<String, Boolean>) : Boolean {
+    fun updateAllergyInfo(userId: Long, allergyMap: Map<String, Boolean>): Boolean {
         return allergyMapper.updateAllergy(userId, allergyMap) > 0
     }
     fun getAllAllergy() = allergyMapper.getAllAllergy()

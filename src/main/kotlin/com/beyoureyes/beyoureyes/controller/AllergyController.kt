@@ -8,25 +8,26 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/update/allergy")
+@RequestMapping("/update")
 class AllergyController (
     private val allergyService: AllergyService
 ){
 
-    @PatchMapping
+    @PatchMapping("/allergy")
     fun updateAllergyInfo(
-        @RequestBody allergyMap : Map<String, Boolean>
-    ) : ResponseEntity<ResponseDto<Unit>> {
+        @RequestBody allergyMap: Map<String, Boolean>
+    ): ResponseEntity<ResponseDto<Any?>> {
         val authentication = SecurityContextHolder.getContext().authentication
         val userId = authentication.principal as? Long
-            ?: return ResponseEntity.status(401).body(ResponseUtil.error("인증되지 않은 사용자입니다.", Unit))
+            ?: return ResponseEntity.status(401).body(ResponseUtil.error("인증되지 않은 사용자입니다.", null))
 
         return if (allergyService.updateAllergyInfo(userId, allergyMap)) {
-            ResponseEntity.ok(ResponseUtil.success("알러지 정보가 업데이트 되었습니다.", Unit))
+            ResponseEntity.ok(ResponseUtil.success("알러지 정보가 업데이트 되었습니다.", null))
         } else {
-            ResponseEntity.ok(ResponseUtil.error("알러지 정보 업데이트 실패했습니다.", Unit))
+            ResponseEntity.ok(ResponseUtil.error("알러지 정보 업데이트 실패했습니다.", null))
         }
     }
+
 
     @GetMapping("/allergy")
     fun getAllAllergy(): ResponseEntity<ResponseDto<Any>> {

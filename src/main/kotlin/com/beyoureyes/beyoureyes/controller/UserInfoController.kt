@@ -15,15 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
-/* -
-* 사용자 정보 저장 - 0 (세부 처리 필요) / 일 년 로그인안한 사람 - 0
-* 사용자 정보 수정 - 0
-* 해당 사용자 -> 오늘 섭취 저장 / firebase 연결 서버에서!복잡할까?0? - 한국 자정
-* 해당 사용자 -> 오늘 섭취 저장 / 한국 자정
-*
-* 익명 로그인 - 0
-* 안드로이드 로컬 저장소 토큰을 저장 - 0
-* */
 @RestController
 @Validated
 @RequestMapping("/user")

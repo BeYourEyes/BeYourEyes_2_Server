@@ -53,12 +53,12 @@ class UserController(private val userService: UserService) {
     }
 
     @DeleteMapping("/delete")
-    fun deleteUser(): ResponseEntity<ResponseDto<Unit>> {
+    fun deleteUser(): ResponseEntity<ResponseDto<Any?>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
         return if( userService.deleteUser(userId)) {
-            ResponseEntity.ok(ResponseUtil.success("사용자 계정이 삭제되었습니다.", Unit))
+            ResponseEntity.ok(ResponseUtil.success("사용자 계정이 삭제되었습니다.", null))
         } else {
-            ResponseEntity.ok(ResponseUtil.error("사용자 계정 삭제 실패", Unit))
+            ResponseEntity.ok(ResponseUtil.error("사용자 계정 삭제 실패", null))
         }
     }
 

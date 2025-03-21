@@ -56,30 +56,32 @@ interface AllergyMapper {
     fun getAllergyByUserId(userId: Long): Allergy? // 수정 필요
 
     @Update("""
-        UPDATE Allergy
-        SET
-            buckwheat = COALESCE(#{allergyMap[buckwheat]}, buckwheat),
-            wheat = COALESCE(#{allergyMap[wheat]}, wheat),
-            soybean = COALESCE(#{allergyMap[soybean]}, soybean),
-            peanut = COALESCE(#{allergyMap[peanut]}, peanut),
-            walnut = COALESCE(#{allergyMap[walnut]}, walnut),
-            pine_nut = COALESCE(#{allergyMap[pine_nut]}, pine_nut),
-            sulfur_dioxide = COALESCE(#{allergyMap[sulfur_dioxide]}, sulfur_dioxide),
-            peach = COALESCE(#{allergyMap[peach]}, peach),
-            tomato = COALESCE(#{allergyMap[tomato]}, tomato),
-            egg = COALESCE(#{allergyMap[egg]}, egg),
-            milk = COALESCE(#{allergyMap[milk]}, milk),
-            shrimp = COALESCE(#{allergyMap[shrimp]}, shrimp),
-            mackerel = COALESCE(#{allergyMap[mackerel]}, mackerel),
-            squid = COALESCE(#{allergyMap[squid]}, squid),
-            crab = COALESCE(#{allergyMap[crab]}, crab),
-            shellfish = COALESCE(#{allergyMap[shellfish]}, shellfish),
-            pork = COALESCE(#{allergyMap[pork]}, pork),
-            beef = COALESCE(#{allergyMap[beef]}, beef),
-            chicken = COALESCE(#{allergyMap[chicken]}, chicken)
-        WHERE user_id = #{userId}
-    """)
-    fun updateAllergy(userId: Long, allergyMap: Map<String, Boolean>) : Int
+    UPDATE Allergy
+    SET
+        buckwheat = CASE WHEN #{allergyMap[buckwheat]} IS TRUE AND buckwheat = FALSE THEN TRUE ELSE buckwheat END,
+        wheat = CASE WHEN #{allergyMap[wheat]} IS TRUE AND wheat = FALSE THEN TRUE ELSE wheat END,
+        soybean = CASE WHEN #{allergyMap[soybean]} IS TRUE AND soybean = FALSE THEN TRUE ELSE soybean END,
+        peanut = CASE WHEN #{allergyMap[peanut]} IS TRUE AND peanut = FALSE THEN TRUE ELSE peanut END,
+        walnut = CASE WHEN #{allergyMap[walnut]} IS TRUE AND walnut = FALSE THEN TRUE ELSE walnut END,
+        pine_nut = CASE WHEN #{allergyMap[pine_nut]} IS TRUE AND pine_nut = FALSE THEN TRUE ELSE pine_nut END,
+        sulfur_dioxide = CASE WHEN #{allergyMap[sulfur_dioxide]} IS TRUE AND sulfur_dioxide = FALSE THEN TRUE ELSE sulfur_dioxide END,
+        peach = CASE WHEN #{allergyMap[peach]} IS TRUE AND peach = FALSE THEN TRUE ELSE peach END,
+        tomato = CASE WHEN #{allergyMap[tomato]} IS TRUE AND tomato = FALSE THEN TRUE ELSE tomato END,
+        egg = CASE WHEN #{allergyMap[egg]} IS TRUE AND egg = FALSE THEN TRUE ELSE egg END,
+        milk = CASE WHEN #{allergyMap[milk]} IS TRUE AND milk = FALSE THEN TRUE ELSE milk END,
+        shrimp = CASE WHEN #{allergyMap[shrimp]} IS TRUE AND shrimp = FALSE THEN TRUE ELSE shrimp END,
+        mackerel = CASE WHEN #{allergyMap[mackerel]} IS TRUE AND mackerel = FALSE THEN TRUE ELSE mackerel END,
+        squid = CASE WHEN #{allergyMap[squid]} IS TRUE AND squid = FALSE THEN TRUE ELSE squid END,
+        crab = CASE WHEN #{allergyMap[crab]} IS TRUE AND crab = FALSE THEN TRUE ELSE crab END,
+        shellfish = CASE WHEN #{allergyMap[shellfish]} IS TRUE AND shellfish = FALSE THEN TRUE ELSE shellfish END,
+        pork = CASE WHEN #{allergyMap[pork]} IS TRUE AND pork = FALSE THEN TRUE ELSE pork END,
+        beef = CASE WHEN #{allergyMap[beef]} IS TRUE AND beef = FALSE THEN TRUE ELSE beef END,
+        chicken = CASE WHEN #{allergyMap[chicken]} IS TRUE AND chicken = FALSE THEN TRUE ELSE chicken END
+    WHERE user_id = #{userId}
+""")
+    fun updateAllergy(userId: Long, allergyMap: Map<String, Boolean>): Int
+
+
 
     @Select("SELECT * FROM Allergy")
     fun getAllAllergy(): List<Map<String, Any>>
