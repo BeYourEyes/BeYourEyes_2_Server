@@ -13,14 +13,14 @@ class DiseaseController (
     private val diseaseService: DiseaseService
 ) {
     @PatchMapping
-    fun updateDisaseInfo(@RequestBody diseaseMap: Map<String, Boolean>) : ResponseEntity<ResponseDto<Unit>> {
+    fun updateDisaseInfo(@RequestBody diseaseMap: Map<String, Boolean>) : ResponseEntity<ResponseDto<Any?>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
 
         return if (diseaseService.updateDiseaseInfo(userId, diseaseMap)) {
-            ResponseEntity.ok(ResponseUtil.success("질환 정보가 업데이트 되었습니다." ,Unit))
+            ResponseEntity.ok(ResponseUtil.success("질환 정보가 업데이트 되었습니다." ,null))
 
         } else {
-            ResponseEntity.ok(ResponseUtil.error("질환 정보 업데이트에 실패했습니다.", Unit))
+            ResponseEntity.ok(ResponseUtil.error("질환 정보 업데이트에 실패했습니다.", null))
         }
     }
 
