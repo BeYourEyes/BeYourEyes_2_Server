@@ -114,19 +114,20 @@ class UserInfoController(
     }
 
     @PatchMapping("/update/user-info")
-    fun updateUserInfo2(@RequestBody request : Map<String, Any>): ResponseEntity<ResponseDto<Unit>> {
+    fun updateUserInfo2(@RequestBody request: Map<String, Any>): ResponseEntity<ResponseDto<Any?>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
         val userBirth = request["user_birth"] as? String
         val userGender = request["user_gender"] as? Int
         val userNickname = request["user_nickname"] as? String
 
         return if (userInfoService.updateUserInfo(userId, userBirth, userGender, userNickname)) {
-            ResponseEntity.ok(ResponseUtil.success("사용자 정보가 업데이트 되었습니다.", Unit))
+            ResponseEntity.ok(ResponseUtil.success("사용자 정보가 업데이트 되었습니다.", null))
         } else {
-            ResponseEntity.ok(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", Unit))
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", null))
         }
-
     }
+
+
 
     @GetMapping("/check-nickname")
     fun checkNickname(@RequestParam nickname: String): ResponseEntity<ResponseDto<Boolean>> {
