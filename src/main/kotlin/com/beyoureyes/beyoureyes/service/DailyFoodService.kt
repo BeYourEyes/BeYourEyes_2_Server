@@ -5,6 +5,7 @@ import com.beyoureyes.beyoureyes.dto.DailyFoodResponseDto
 import com.beyoureyes.beyoureyes.dto.NutrientSummaryDto
 import com.beyoureyes.beyoureyes.entity.DailyFood
 import com.beyoureyes.beyoureyes.mapper.DailyFoodMapper
+import com.google.cloud.storage.Acl
 import com.google.common.collect.Multimap
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

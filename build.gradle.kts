@@ -63,6 +63,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
+	implementation("com.google.cloud:google-cloud-storage:2.28.0")
+
 }
 
 kotlin {
