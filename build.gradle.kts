@@ -75,5 +75,10 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
+tasks.withType<BootJar> {
+	mainClass.set("com.beyoureyes.ApplicationKt")
+}
+
+
 
 
