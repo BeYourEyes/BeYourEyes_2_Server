@@ -8,11 +8,8 @@ import com.google.cloud.storage.Bucket
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.io.ClassPathResource
-import java.io.FileNotFoundException
+import java.io.FileInputStream
 import java.io.IOException
-
-
 
 @Configuration
 class FirebaseConfig {
@@ -26,8 +23,7 @@ class FirebaseConfig {
     @Bean
     @Throws(IOException::class)
     fun firebaseApp(): FirebaseApp {
-        val inputStream = this::class.java.classLoader.getResourceAsStream(account)
-            ?: throw FileNotFoundException("File $account not found in classpath")
+        val inputStream = FileInputStream(account)  // ⭐ 경로에서 직접 읽도록 수정
 
         val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(inputStream))
@@ -36,7 +32,6 @@ class FirebaseConfig {
 
         return FirebaseApp.initializeApp(options)
     }
-
 
     @Bean
     @Throws(IOException::class)
