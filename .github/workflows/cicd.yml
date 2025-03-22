@@ -3,8 +3,8 @@ name: Build & Deploy Spring Boot to Mini PC
 on:
   push:
     branches:
-      - main  # main 브랜치에 Push하면 실행됨!
-  workflow_dispatch:  # 수동 실행 가능
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
           
       - name: Rename JAR File
         run: |
-          ls -lh build/libs  # 빌드된 JAR 파일 목록 확인
+          ls -lh build/libs
           mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
           
       - name: Set up Docker Buildx
@@ -63,15 +63,9 @@ jobs:
         run: |
           ssh-keyscan -p 234 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Debug SSH Key Storage
+      - name: Test SSH Connection
         run: |
-          echo "🔍 Checking stored SSH keys..."
-          ls -l ~/.ssh
-          cat ~/.ssh/id_rsa_github_actions | head -n 5  # 첫 5줄만 출력 (보안상 문제 없음)
-
-      - name: Test SSH Connection (Using id_rsa_github_actions)
-        run: |
-          ssh -o StrictHostKeyChecking=no -vvv -i ~/.ssh/id_rsa_github_actions -p 234 soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
+          ssh -i ~/.ssh/id_rsa_github_actions -p 234 -o StrictHostKeyChecking=no soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
 
       - name: SSH Deploy & Run
         uses: appleboy/ssh-action@master
@@ -82,12 +76,24 @@ jobs:
           port: 234
           script: |
             echo "✅ Successfully connected to Mini PC!"
+
+            # 기존 컨테이너 정리
             docker stop spring-beyour || true
             docker rm spring-beyour || true
+
+            # 최신 이미지 pull
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
+
+            # 환경변수 파일 생성
+            echo DB_URL="${{ secrets.DB_URL }}" > .env
+            echo DB_USERNAME="${{ secrets.DB_USERNAME }}" >> .env
+            echo DB_PASSWORD="${{ secrets.DB_PASSWORD }}" >> .env
+            echo FIREBASE_CONFIG="${{ secrets.FIREBASE_CONFIG }}" >> .env
+
+            # 새 컨테이너 실행
             docker run -d -p 8080:8080 --name spring-beyour \
-              -e DB_URL=${{ secrets.DB_URL }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }} \
+              --env-file .env \
               ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
+
+            # (선택) .env 파일 삭제
+            rm .env
