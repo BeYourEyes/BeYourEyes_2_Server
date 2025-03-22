@@ -62,34 +62,33 @@ jobs:
           port: 234
           script: |
             echo "✅ Successfully connected to Mini PC!"
-      
-            # 이전 컨테이너 정리
+
+            # 기존 컨테이너 정리
             docker stop beyour-app || true
             docker rm beyour-app || true
-      
+
             # 최신 이미지 pull
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
-      
-            # firebase json 저장
+
+            # Firebase JSON 저장
             echo '${{ secrets.FIREBASE_CONFIG_BASE64 }}' | base64 -d > firebase-key.json
-      
-            # 환경변수 파일 생성
+
+            # Spring Boot 환경 변수 설정
             cat <<EOF > .env
-            DB_URL=${{ secrets.DB_URL }}
-            DB_USERNAME=${{ secrets.DB_USERNAME }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            spring.datasource.url=${{ secrets.DB_URL }}
+            spring.datasource.username=${{ secrets.DB_USERNAME }}
+            spring.datasource.password=${{ secrets.DB_PASSWORD }}
             firebase.configuration-file=firebase-key.json
             firebase.bucket=${{ secrets.FIREBASE_BUCKET }}
             EOF
-      
-            # 새 컨테이너 실행
+
+            # 컨테이너 실행
             docker run -d -p 8080:8080 --name beyour-app \
               --env-file .env \
               -v $(pwd)/firebase-key.json:/app/firebase-key.json \
               -w /app \
               ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
-      
+
             # 정리
             rm .env
             docker image prune -f
-
