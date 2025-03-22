@@ -73,7 +73,9 @@ tasks.withType<Test> {
 }
 
 tasks.withType<BootJar> {
+	archiveFileName.set("beyour.jar")
 	mainClass.set("com.beyoureyes.beyoureyes.BeyoureyesApplicationKt")
 }
+
 
 
