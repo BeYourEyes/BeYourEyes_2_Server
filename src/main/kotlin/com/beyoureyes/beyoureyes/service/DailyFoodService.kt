@@ -49,6 +49,13 @@ class DailyFoodService(
     fun uploadImageToFirebase(image: MultipartFile): String {
         val fileName = "daily_food/${UUID.randomUUID()}_${image.originalFilename}"
         val blob = bucket.create(fileName, image.bytes, image.contentType)
+
+        // 모든 사용자에게 읽기 권한 부여
+        blob.toBuilder()
+            .setAcl(listOf(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)))
+            .build()
+            .update()
+
         return "https://storage.googleapis.com/${bucket.name}/${blob.name}"
     }
 
