@@ -70,16 +70,16 @@ jobs:
             # 최신 이미지 pull
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
 
-            # 환경변수 파일 생성
+            # 환경변수 파일 생성 (.env)
             echo DB_URL="${{ secrets.DB_URL }}" > .env
             echo DB_USERNAME="${{ secrets.DB_USERNAME }}" >> .env
             echo DB_PASSWORD="${{ secrets.DB_PASSWORD }}" >> .env
-            echo FIREBASE_CONFIG="${{ secrets.FIREBASE_CONFIG }}" >> .env
+            echo FIREBASE_CONFIG="$(echo '${{ secrets.FIREBASE_CONFIG_BASE64 }}' | base64 -d)" >> .env
 
             # 새 컨테이너 실행
             docker run -d -p 8080:8080 --name spring-beyour \
               --env-file .env \
               ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
 
-            # (선택) .env 파일 삭제
+            # 환경변수 파일 삭제
             rm .env
