@@ -78,7 +78,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<BootJar> {
-	mainClass.set("com.beyoureyes.ApplicationKt")
+	mainClass.set("com.beyoureyes.beyoureyes.BeyoureyesApplicationKt")
 }
 
 
