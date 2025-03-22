@@ -30,6 +30,11 @@ jobs:
           ls -lh build/libs
           mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
 
+      - name: Show JAR Manifest (Check Main-Class)
+        run: |
+          echo "Checking MANIFEST.MF contents in beyour.jar"
+          unzip -p build/libs/beyour.jar META-INF/MANIFEST.MF
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
