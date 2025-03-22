@@ -53,20 +53,6 @@ jobs:
       - name: Check GitHub Actions Runner Public IP
         run: curl ifconfig.me
 
-      - name: Set Up SSH Key (id_rsa_github_actions)
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_github_actions
-          chmod 600 ~/.ssh/id_rsa_github_actions
-
-      - name: Add SSH Host Key to Known Hosts
-        run: |
-          ssh-keyscan -p 234 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-      - name: Test SSH Connection
-        run: |
-          ssh -i ~/.ssh/id_rsa_github_actions -p 234 -o StrictHostKeyChecking=no soojin@${{ secrets.SERVER_IP }} echo "✅ SSH connection test successful"
-
       - name: SSH Deploy & Run
         uses: appleboy/ssh-action@master
         with:
