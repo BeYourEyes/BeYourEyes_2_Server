@@ -28,12 +28,6 @@ tasks.jar {
 	}
 }
 
-tasks.bootJar {
-	manifest {
-		attributes["Main-Class"] = "com.beyoureyes.beyoureyes.Application"
-	}
-}
-
 repositories {
 	mavenCentral()
 }
