@@ -25,11 +25,6 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      - name: Rename JAR File
-        run: |
-          ls -lh build/libs
-          mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
-
       - name: Show JAR Manifest (Check Main-Class)
         run: |
           echo "Checking MANIFEST.MF contents in beyour.jar"
