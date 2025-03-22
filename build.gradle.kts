@@ -22,11 +22,6 @@ configurations {
 	}
 }
 
-tasks.jar {
-	manifest {
-		attributes["Main-Class"] = "com.beyoureyes.beyoureyes.Application"
-	}
-}
 
 repositories {
 	mavenCentral()
@@ -80,7 +75,5 @@ tasks.withType<Test> {
 tasks.withType<BootJar> {
 	mainClass.set("com.beyoureyes.beyoureyes.BeyoureyesApplicationKt")
 }
-
-
 
 
