@@ -24,12 +24,12 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
-          
+
       - name: Rename JAR File
         run: |
           ls -lh build/libs
           mv $(ls build/libs/*.jar | head -n 1) build/libs/beyour.jar
-          
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -64,22 +64,27 @@ jobs:
             echo "✅ Successfully connected to Mini PC!"
 
             # 기존 컨테이너 정리
-            docker stop spring-beyour || true
-            docker rm spring-beyour || true
+            docker stop beyour-app || true
+            docker rm beyour-app || true
 
             # 최신 이미지 pull
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
 
-            # 환경변수 파일 생성 (.env)
-            echo DB_URL="${{ secrets.DB_URL }}" > .env
-            echo DB_USERNAME="${{ secrets.DB_USERNAME }}" >> .env
-            echo DB_PASSWORD="${{ secrets.DB_PASSWORD }}" >> .env
-            echo FIREBASE_CONFIG="$(echo '${{ secrets.FIREBASE_CONFIG_BASE64 }}' | base64 -d)" >> .env
+            # 환경변수 파일 생성
+            cat <<EOF > .env
+DB_URL=${{ secrets.DB_URL }}
+DB_USERNAME=${{ secrets.DB_USERNAME }}
+DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+FIREBASE_CONFIG=$(echo '${{ secrets.FIREBASE_CONFIG_BASE64 }}' | base64 -d)
+EOF
 
             # 새 컨테이너 실행
-            docker run -d -p 8080:8080 --name spring-beyour \
+            docker run -d -p 8080:8080 --name beyour-app \
               --env-file .env \
               ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
 
-            # 환경변수 파일 삭제
+            # .env 파일 삭제
             rm .env
+
+            # 불필요한 이미지 정리
+            docker image prune -f
