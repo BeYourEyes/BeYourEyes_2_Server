@@ -71,7 +71,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/beyour-app:latest
 
             # Firebase JSON 저장
-            echo '${{ secrets.FIREBASE_CONFIG_BASE64 }}' | base64 -d > firebase-key.json
+            echo '${{ secrets.FIREBASE_CONFIG }}' | base64 -d > firebase-key.json
 
             # Spring Boot 환경 변수 설정
             cat <<EOF > .env
