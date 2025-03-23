@@ -59,10 +59,29 @@ class DailyFoodService(
         return "https://storage.googleapis.com/${bucket.name}/${blob.name}"
     }
 
-    fun getTodayDailyFoods(userId: Long): List<DailyFoodResponseDto> {
+    fun getTodayDailyFoods(userId: Long): List<Map<String, Any>> {
         val today = LocalDate.now().toString()
-        return dailyFoodMapper.getDailyFoodsByDate(userId, today)
+        val rawList = dailyFoodMapper.getDailyFoodsByDate(userId, today)
+
+        return rawList.map { dto ->
+            mapOf(
+                "log_id" to dto.logId,
+                "food_photo" to dto.foodPhoto,
+                "date_time" to dto.dateTime,
+                "nutrition_info" to mapOf(
+                    "calories" to dto.calories,
+                    "carbohydrates" to dto.carbohydrates,
+                    "protein" to dto.protein,
+                    "fat" to dto.fat,
+                    "cholesterol" to dto.cholesterol,
+                    "sodium" to dto.sodium,
+                    "sugar" to dto.sugar,
+                    "saturatedFat" to dto.saturatedFat
+                )
+            )
+        }
     }
+
 
     fun getTodayNutrientSummary(userId: Long): NutrientSummaryDto {
         val today = LocalDate.now().toString()

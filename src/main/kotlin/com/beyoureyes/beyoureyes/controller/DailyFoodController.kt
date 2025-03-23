@@ -47,11 +47,10 @@ class DailyFoodController(
     }
 
     @GetMapping("/today")
-    @Operation(summary = "오늘 섭취한 모든 음식 기록 조회", description = "오늘 날짜에 저장된 모든 음식 섭취 기록을 반환합니다.")
-    fun getTodayDailyFoods(): ResponseEntity<ResponseDto<List<DailyFoodResponseDto>>> {
+    fun getTodayDailyFoods(): ResponseEntity<ResponseDto<List<Map<String, Any>>>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
-        val dailyFoods = dailyFoodService.getTodayDailyFoods(userId)
-        return ResponseEntity.ok(ResponseUtil.success("오늘 섭취한 음식 기록 조회 성공", dailyFoods))
+        val response = dailyFoodService.getTodayDailyFoods(userId)
+        return ResponseEntity.ok(ResponseUtil.success("오늘 섭취한 음식 기록 조회 성공", response))
     }
 
     @GetMapping("/today/summary")
