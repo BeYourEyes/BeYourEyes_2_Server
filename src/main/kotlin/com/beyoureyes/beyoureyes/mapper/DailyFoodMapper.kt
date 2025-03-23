@@ -32,7 +32,7 @@ interface DailyFoodMapper {
             user_id, date_time, food_photo, calories, carbohydrates, protein, fat, 
             cholesterol, sodium, sugar, saturated_fat
         ) VALUES (
-            #{userId}, NOW(), #{foodPhoto}, #{calories}, #{carbohydrates}, #{protein}, 
+            #{userId}, #{dateTime}, #{foodPhoto}, #{calories}, #{carbohydrates}, #{protein}, 
             #{fat}, #{cholesterol}, #{sodium}, #{sugar}, #{saturatedFat}
         )
     """)
