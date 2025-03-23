@@ -67,7 +67,7 @@ class DailyFoodService(
             mapOf(
                 "log_id" to dto.logId,
                 "food_photo" to dto.foodPhoto,
-                "date_time" to dto.dateTime,
+                "datetime" to dto.dateTime,
                 "nutrition_info" to mapOf(
                     "calories" to dto.calories,
                     "carbohydrates" to dto.carbohydrates,

@@ -48,12 +48,12 @@ interface DailyFoodMapper {
     fun deleteAllDailyFood(): Int
 
     @Select("""
-        SELECT 
-            log_id, food_photo, calories, carbohydrates, protein, fat,
-            cholesterol, sodium, sugar, saturated_fat, date_time
+    SELECT 
+        log_id, food_photo, calories, carbohydrates, protein, fat,
+        cholesterol, sodium, sugar, saturated_fat, date_time
         FROM daily_food
         WHERE user_id = #{userId}
-        AND DATE(date_time) = #{date}
+        AND DATE(date_time) = CAST(#{date} AS DATE)
     """)
     fun getDailyFoodsByDate(
         @Param("userId") userId: Long,
@@ -61,23 +61,24 @@ interface DailyFoodMapper {
     ): List<FlatDailyFoodDto>
 
     @Select("""
-        SELECT 
-            SUM(calories) as calories,
-            SUM(carbohydrates) as carbohydrates,
-            SUM(protein) as protein,
-            SUM(fat) as fat,
-            SUM(cholesterol) as cholesterol,
-            SUM(sodium) as sodium,
-            SUM(sugar) as sugar,
-            SUM(saturated_fat) as saturatedFat
+    SELECT 
+        SUM(calories) as calories,
+        SUM(carbohydrates) as carbohydrates,
+        SUM(protein) as protein,
+        SUM(fat) as fat,
+        SUM(cholesterol) as cholesterol,
+        SUM(sodium) as sodium,
+        SUM(sugar) as sugar,
+        SUM(saturated_fat) as saturatedFat
         FROM daily_food
         WHERE user_id = #{userId}
-        AND DATE(date_time) = #{date}
+        AND DATE(date_time) = CAST(#{date} AS DATE)
     """)
     fun getNutrientSummaryByDate(
         @Param("userId") userId: Long,
         @Param("date") date: String
     ): NutrientSummaryDto
+
 
     @Select("SELECT * FROM daily_food")
     fun getAllDailyFood(): List<Map<String, Any>>
