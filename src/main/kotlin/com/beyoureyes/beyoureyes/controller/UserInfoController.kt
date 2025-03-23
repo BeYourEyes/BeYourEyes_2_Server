@@ -97,7 +97,6 @@ class UserInfoController(
 
         val responseData: Map<String, Any?> = mapOf(
             "user_info" to mapOf(
-                "user_id" to userInfo.userId,
                 "user_birth" to userInfo.userBirth,
                 "user_gender" to userInfo.userGender,
                 "user_nickname" to userInfo.userNickname
