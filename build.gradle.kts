@@ -60,6 +60,8 @@ dependencies {
 
 	implementation("com.google.cloud:google-cloud-storage:2.28.0")
 
+	implementation("org.postgresql:postgresql:42.7.3")
+
 }
 
 kotlin {
