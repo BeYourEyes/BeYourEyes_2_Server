@@ -17,7 +17,7 @@ interface UserMapper {
     """)
     fun createTableNotExists()
 
-    @Select("SELECT user_id, device_id FROM \"user\"")
+    @Select("SELECT user_id, device_id, deleted_at FROM \"user\"")
     fun findAll(): List<User>
 
     @Select("""
