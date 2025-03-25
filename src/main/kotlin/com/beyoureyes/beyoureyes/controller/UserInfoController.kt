@@ -25,7 +25,7 @@ class UserInfoController(
 ) {
     @PostMapping("/save-user")
     fun saveUserInfo(@Valid @RequestBody request: SaveUserRequestDto): ResponseEntity<out ResponseDto<out String?>> {
-        val userIdResult = userService.createUser(request.device_id)
+        val userIdResult = userService.createUser(request.device_id.trim())
 
         if (userIdResult == -1L) {
             return ResponseEntity

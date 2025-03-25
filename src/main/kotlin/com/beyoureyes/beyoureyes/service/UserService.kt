@@ -24,6 +24,8 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
         val user = userMapper.findByDeviceId(deviceId.trim())
 
+        println(user)
+
         if (user == null) {
             return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
