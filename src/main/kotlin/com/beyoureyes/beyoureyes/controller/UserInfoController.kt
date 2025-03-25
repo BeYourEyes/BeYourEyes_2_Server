@@ -115,7 +115,7 @@ class UserInfoController(
         return ResponseEntity.ok(ResponseUtil.success("사용자 정보 조회 성공했습니다.", responseData))
     }
 
-    @PatchMapping("/update/user-info")
+    @PatchMapping("/update")
     fun updateUserInfo2(@RequestBody request: Map<String, Any>): ResponseEntity<ResponseDto<Any?>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
         val userBirth = request["user_birth"] as? String
