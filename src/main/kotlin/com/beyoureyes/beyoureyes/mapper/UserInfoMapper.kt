@@ -2,6 +2,7 @@ package com.beyoureyes.beyoureyes.mapper
 
 import com.beyoureyes.beyoureyes.entity.UserInfo
 import org.apache.ibatis.annotations.*
+import java.time.LocalDate
 
 @Mapper
 interface UserInfoMapper {
@@ -33,7 +34,7 @@ interface UserInfoMapper {
     @Update("""
         UPDATE user_info
         SET
-            user_birth = COALESCE(#{userBirth}, user_birth),
+            user_birth = COALESCE(CAST(#{userBirth} AS date), user_birth),
             user_gender = COALESCE(#{userGender}, user_gender),
             user_nickname = COALESCE(#{userNickname}, user_nickname)
         WHERE user_id = #{userId}

@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @RestController
 @Validated
@@ -115,19 +117,28 @@ class UserInfoController(
         return ResponseEntity.ok(ResponseUtil.success("사용자 정보 조회 성공했습니다.", responseData))
     }
 
-    @PatchMapping("/update/user-info")
-    fun updateUserInfo2(@RequestBody request: Map<String, Any>): ResponseEntity<ResponseDto<Any?>> {
+    @PatchMapping("/update")
+    fun updateUserInfo(@RequestBody request: Map<String, Any>): ResponseEntity<ResponseDto<Any?>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
-        val userBirth = request["user_birth"] as? String
-        val userGender = request["user_gender"] as? Int
+
+        val userBirthStr = request["user_birth"] as? String
+        //val userBirth = userBirthStr?.let {
+        //    LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        //}
+
+        val userGender = (request["user_gender"] as? Number)?.toInt()
         val userNickname = request["user_nickname"] as? String
 
-        return if (userInfoService.updateUserInfo(userId, userBirth, userGender, userNickname)) {
+        //println(userBirthStr + " " + userGender + " " + userNickname)
+
+
+        return if (userInfoService.updateUserInfo(userId, userBirthStr, userGender, userNickname)) {
             ResponseEntity.ok(ResponseUtil.success("사용자 정보가 업데이트 되었습니다.", null))
         } else {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseUtil.error("사용자 정보 업데이트 실패했습니다.", null))
         }
     }
+
 
 
 

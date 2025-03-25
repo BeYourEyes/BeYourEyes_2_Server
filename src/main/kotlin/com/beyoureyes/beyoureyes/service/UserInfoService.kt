@@ -115,13 +115,12 @@ class UserInfoService(
         userBirth: String?,
         userGender: Int?,
         userNickname: String?
-    ) : Boolean {
-        // userBirth가 null이 아니면 LocalDate로 변환
-        val formattedBirthDate = userBirth?.let {
-            LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        }?.toString()
-        return userInfoMapper.updateUserInfo(userId, formattedBirthDate, userGender, userNickname) > 0
+    ): Boolean {
+//        val result = userInfoMapper.updateUserInfo(userId, userBirth, userGender, userNickname)
+//        println("sdfsd " + result)
+        return userInfoMapper.updateUserInfo(userId, userBirth, userGender, userNickname) > 0
     }
+
 
     fun isNicknameAvaliable(nickname : String): Boolean {
         return userInfoMapper.countByNickname(nickname) == 0
