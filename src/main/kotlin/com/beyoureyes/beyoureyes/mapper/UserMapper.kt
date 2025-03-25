@@ -20,8 +20,13 @@ interface UserMapper {
     @Select("SELECT user_id, device_id FROM \"user\"")
     fun findAll(): List<User>
 
-    @Select("SELECT user_id FROM \"user\" WHERE device_id = #{deviceId}")
+    @Select("""
+        SELECT user_id, device_id, last_login, deleted_at
+        FROM "user"
+        WHERE device_id = #{deviceId}
+    """)
     fun findByDeviceId(deviceId: String): User?
+
 
     @Insert("INSERT INTO \"user\" (device_id) VALUES (#{deviceId})")
     @Options(useGeneratedKeys = true, keyProperty = "userId")

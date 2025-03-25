@@ -31,6 +31,17 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
                 .status(HttpStatus.NOT_FOUND)
                 .body(ResponseUtil.no_data("존재하지 않는 사용자입니다. 정보 저장이 필요합니다.", null))
         }
+        if (user.deletedAt != null) {
+            userMapper.reactivateUser(user.userId!!)
+
+            val accessToken = jwtUtil.generateAccessToken(user.userId)
+            val refreshToken = jwtUtil.generateRefreshToken(user.userId)
+            userMapper.updateRefreshToken(user.userId, refreshToken)
+
+            return ResponseEntity.ok(
+                ResponseUtil.active("휴먼처리된 계정에서 일반 계정으로 전환합니다.", accessToken)
+            )
+        }
 
         val accessToken = jwtUtil.generateAccessToken(user.userId!!)
         val refreshToken = jwtUtil.generateRefreshToken(user.userId)
