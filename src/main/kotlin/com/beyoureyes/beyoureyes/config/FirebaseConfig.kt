@@ -8,6 +8,7 @@ import com.google.cloud.storage.Bucket
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 
@@ -23,7 +24,9 @@ class FirebaseConfig {
     @Bean
     @Throws(IOException::class)
     fun firebaseApp(): FirebaseApp {
-        val inputStream = FileInputStream(account)  // 경로에서 파일 직접 로드
+        //val resource = File(account)
+        //val inputStream = FileInputStream(resource)
+        val inputStream = FileInputStream(account)  // 경로에서 파일 직접 로드 - 배포 환경!
 
         val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(inputStream))

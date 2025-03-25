@@ -19,4 +19,8 @@ object ResponseUtil {
         return ResponseDto(ResponseStatus.NO_DATA, message, data)
     }
 
+    fun <T> active(message : String, data : T) : ResponseDto<T> {
+        return ResponseDto(ResponseStatus.ACCOUNT_ACTIVE, message, data)
+    }
+
 }

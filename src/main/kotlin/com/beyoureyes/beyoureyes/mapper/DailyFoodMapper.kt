@@ -1,6 +1,7 @@
 package com.beyoureyes.beyoureyes.mapper
 
 import com.beyoureyes.beyoureyes.dto.DailyFoodResponseDto
+import com.beyoureyes.beyoureyes.dto.FlatDailyFoodDto
 import com.beyoureyes.beyoureyes.dto.NutrientSummaryDto
 import com.beyoureyes.beyoureyes.entity.DailyFood
 import org.apache.ibatis.annotations.*
@@ -9,72 +10,76 @@ import org.apache.ibatis.annotations.*
 interface DailyFoodMapper {
 
     @Update("""
-        CREATE TABLE IF NOT EXISTS DailyFood (
-            log_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS daily_food (
+            log_id SERIAL PRIMARY KEY,
             user_id BIGINT NOT NULL,
-            date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            date_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             food_photo VARCHAR(255),
-            calories DECIMAL(10, 2) DEFAULT 0.0,
-            carbohydrates DECIMAL(10, 2) DEFAULT 0.0,
-            protein DECIMAL(10, 2) DEFAULT 0.0,
-            fat DECIMAL(10, 2) DEFAULT 0.0,
-            cholesterol DECIMAL(10, 2) DEFAULT 0.0,
-            sodium DECIMAL(10, 2) DEFAULT 0.0,
-            sugar DECIMAL(10, 2) DEFAULT 0.0,
-            saturated_fat DECIMAL(10, 2) DEFAULT 0.0,
-            CONSTRAINT fk_foodlog_user_id FOREIGN KEY (user_id) REFERENCES userInfo(user_id) ON DELETE CASCADE
+            calories INTEGER DEFAULT 0,
+            carbohydrates INTEGER DEFAULT 0,
+            protein INTEGER DEFAULT 0,
+            fat INTEGER DEFAULT 0,
+            cholesterol INTEGER DEFAULT 0,
+            sodium INTEGER DEFAULT 0,
+            sugar INTEGER DEFAULT 0,
+            saturated_fat INTEGER DEFAULT 0,
+            CONSTRAINT fk_foodlog_user_id FOREIGN KEY (user_id) REFERENCES "user_info"(user_id) ON DELETE CASCADE
         )
     """)
     fun createTableIfNotExists()
 
+
     @Insert("""
-        INSERT INTO DailyFood (
+        INSERT INTO daily_food (
             user_id, date_time, food_photo, calories, carbohydrates, protein, fat, 
             cholesterol, sodium, sugar, saturated_fat
         ) VALUES (
-            #{userId}, NOW(), #{foodPhoto}, #{calories}, #{carbohydrates}, #{protein}, 
+            #{userId}, #{dateTime}, #{foodPhoto}, #{calories}, #{carbohydrates}, #{protein}, 
             #{fat}, #{cholesterol}, #{sodium}, #{sugar}, #{saturatedFat}
         )
     """)
     @Options(useGeneratedKeys = true, keyProperty = "logId")
-    fun insertDailyFood(dailyFood : DailyFood): Int
-    @Select("SELECT food_photo FROM DailyFood")
+    fun insertDailyFood(dailyFood: DailyFood): Int
+
+    @Select("SELECT food_photo FROM daily_food")
     fun getAllImageUrls(): List<String>
-    @Update("DELETE FROM DailyFood")
+
+    @Update("DELETE FROM daily_food")
     fun deleteAllDailyFood(): Int
 
     @Select("""
-        SELECT 
-            log_id, food_photo, calories, carbohydrates, protein, fat,
-            cholesterol, sodium, sugar, saturated_fat, date_time
-        FROM DailyFood 
-        WHERE user_id = #{userId} 
-        AND DATE(date_time) = #{date}
+    SELECT 
+        log_id, food_photo, calories, carbohydrates, protein, fat,
+        cholesterol, sodium, sugar, saturated_fat, date_time
+        FROM daily_food
+        WHERE user_id = #{userId}
+        AND DATE(date_time) = CAST(#{date} AS DATE)
     """)
     fun getDailyFoodsByDate(
         @Param("userId") userId: Long,
         @Param("date") date: String
-    ): List<DailyFoodResponseDto>
+    ): List<FlatDailyFoodDto>
 
     @Select("""
-        SELECT 
-            SUM(calories) as calories,
-            SUM(carbohydrates) as carbohydrates,
-            SUM(protein) as protein,
-            SUM(fat) as fat,
-            SUM(cholesterol) as cholesterol,
-            SUM(sodium) as sodium,
-            SUM(sugar) as sugar,
-            SUM(saturated_fat) as saturatedFat
-        FROM DailyFood 
-        WHERE user_id = #{userId} 
-        AND DATE(date_time) = #{date}
+    SELECT 
+        SUM(calories) as calories,
+        SUM(carbohydrates) as carbohydrates,
+        SUM(protein) as protein,
+        SUM(fat) as fat,
+        SUM(cholesterol) as cholesterol,
+        SUM(sodium) as sodium,
+        SUM(sugar) as sugar,
+        SUM(saturated_fat) as saturatedFat
+        FROM daily_food
+        WHERE user_id = #{userId}
+        AND DATE(date_time) = CAST(#{date} AS DATE)
     """)
     fun getNutrientSummaryByDate(
         @Param("userId") userId: Long,
         @Param("date") date: String
     ): NutrientSummaryDto
 
-    @Select("SELECT * FROM DailyFood")
+
+    @Select("SELECT * FROM daily_food")
     fun getAllDailyFood(): List<Map<String, Any>>
 }

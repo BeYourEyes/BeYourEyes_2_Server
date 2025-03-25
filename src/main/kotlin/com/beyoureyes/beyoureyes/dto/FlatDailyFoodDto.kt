@@ -1,6 +1,10 @@
 package com.beyoureyes.beyoureyes.dto
 
-data class NutrientSummaryDto(
+import java.time.LocalDateTime
+
+data class FlatDailyFoodDto(
+    val logId: Int,
+    val foodPhoto: String,
     val calories: Int,
     val carbohydrates: Int,
     val protein: Int,
@@ -8,5 +12,6 @@ data class NutrientSummaryDto(
     val cholesterol: Int,
     val sodium: Int,
     val sugar: Int,
-    val saturatedFat: Int
+    val saturatedFat: Int,
+    val dateTime: LocalDateTime
 )

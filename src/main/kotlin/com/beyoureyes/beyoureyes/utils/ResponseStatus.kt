@@ -4,5 +4,6 @@ enum class ResponseStatus {
     SUCCESS,
     FAILURE,
     ERROR,
-    NO_DATA
+    NO_DATA,
+    ACCOUNT_ACTIVE
 }

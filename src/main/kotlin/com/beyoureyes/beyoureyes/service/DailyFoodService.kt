@@ -23,14 +23,13 @@ class DailyFoodService(
 ) {
 
     @Transactional
-    fun saveDailyFood(userId: Long, image: MultipartFile, request: DailyFoodRequestDto): String {
-        // 이미지 업로드 및 URL 생성
+    fun saveDailyFood(userId: Long, image: MultipartFile, request: DailyFoodRequestDto): Pair<String, LocalDateTime> {
         val imageUrl = uploadImageToFirebase(image)
+        val now = LocalDateTime.now()
 
-        // DailyFood 엔티티 생성
         val dailyFood = DailyFood(
             userId = userId,
-            dateTime = LocalDateTime.now(),
+            dateTime = now,
             foodPhoto = imageUrl,
             calories = request.calories,
             carbohydrates = request.carbohydrates,
@@ -42,9 +41,9 @@ class DailyFoodService(
             saturatedFat = request.saturatedFat
         )
 
-        // 데이터베이스에 저장
         dailyFoodMapper.insertDailyFood(dailyFood)
-        return imageUrl
+
+        return Pair(imageUrl, now)
     }
 
     fun uploadImageToFirebase(image: MultipartFile): String {
@@ -60,10 +59,29 @@ class DailyFoodService(
         return "https://storage.googleapis.com/${bucket.name}/${blob.name}"
     }
 
-    fun getTodayDailyFoods(userId: Long): List<DailyFoodResponseDto> {
+    fun getTodayDailyFoods(userId: Long): List<Map<String, Any>> {
         val today = LocalDate.now().toString()
-        return dailyFoodMapper.getDailyFoodsByDate(userId, today)
+        val rawList = dailyFoodMapper.getDailyFoodsByDate(userId, today)
+
+        return rawList.map { dto ->
+            mapOf(
+                "log_id" to dto.logId,
+                "food_photo" to dto.foodPhoto,
+                "datetime" to dto.dateTime,
+                "nutrition_info" to mapOf(
+                    "calories" to dto.calories,
+                    "carbohydrates" to dto.carbohydrates,
+                    "protein" to dto.protein,
+                    "fat" to dto.fat,
+                    "cholesterol" to dto.cholesterol,
+                    "sodium" to dto.sodium,
+                    "sugar" to dto.sugar,
+                    "saturatedFat" to dto.saturatedFat
+                )
+            )
+        }
     }
+
 
     fun getTodayNutrientSummary(userId: Long): NutrientSummaryDto {
         val today = LocalDate.now().toString()
