@@ -1,6 +1,7 @@
 package com.beyoureyes.beyoureyes.mapper
 
 import com.beyoureyes.beyoureyes.entity.Allergy
+import com.beyoureyes.beyoureyes.entity.AllergyInfo
 import org.apache.ibatis.annotations.*
 
 @Mapper
@@ -42,8 +43,29 @@ interface AllergyMapper {
     """)
     fun insertAllergy(allergy: Allergy): Int
 
+    @Results(id = "AllergyResultMap", value = [
+        Result(property = "buckwheat", column = "buckwheat"),
+        Result(property = "wheat", column = "wheat"),
+        Result(property = "soybean", column = "soybean"),
+        Result(property = "peanut", column = "peanut"),
+        Result(property = "walnut", column = "walnut"),
+        Result(property = "pineNut", column = "pine_nut"),
+        Result(property = "sulfurDioxide", column = "sulfur_dioxide"),
+        Result(property = "peach", column = "peach"),
+        Result(property = "tomato", column = "tomato"),
+        Result(property = "egg", column = "egg"),
+        Result(property = "milk", column = "milk"),
+        Result(property = "shrimp", column = "shrimp"),
+        Result(property = "mackerel", column = "mackerel"),
+        Result(property = "squid", column = "squid"),
+        Result(property = "crab", column = "crab"),
+        Result(property = "shellfish", column = "shellfish"),
+        Result(property = "pork", column = "pork"),
+        Result(property = "beef", column = "beef"),
+        Result(property = "chicken", column = "chicken")
+    ])
     @Select("""
-        SELECT 
+    SELECT 
             buckwheat, wheat, soybean, peanut, walnut, 
             pine_nut, sulfur_dioxide, peach, tomato, 
             egg, milk, shrimp, mackerel, squid, 
@@ -51,7 +73,8 @@ interface AllergyMapper {
         FROM allergy 
         WHERE user_id = #{userId}
     """)
-    fun getAllergyByUserId(userId: Long): Allergy?
+    fun getAllergyByUserId(userId: Long): AllergyInfo?
+
 
     @Update("""
         UPDATE allergy

@@ -1,6 +1,6 @@
 package com.beyoureyes.beyoureyes.entity
 
-data class Allergy @JvmOverloads constructor(
+class AllergyInfo @JvmOverloads constructor(
 
     val buckwheat : Boolean = false, // 메밀
     val wheat : Boolean  = false, // 밀
@@ -21,6 +21,5 @@ data class Allergy @JvmOverloads constructor(
     val pork : Boolean = false, // 돼지고기
     val beef : Boolean = false, // 쇠고기
     val chicken : Boolean = false, // 닭고기
-    val allergyId : Long? = null,
-    val userId : Long? = null
+
 )

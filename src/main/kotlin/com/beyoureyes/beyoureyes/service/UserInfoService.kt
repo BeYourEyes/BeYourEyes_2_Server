@@ -58,6 +58,8 @@ class UserInfoService(
             ?: throw IllegalArgumentException("해당 유저 없음")
 
         val allergy = allergyMapper.getAllergyByUserId(userId)
+
+        println(allergy)
         val disease = diseaseMapper.getDiseaseByUserId(userId)
 
         // allergy에서 true인 값만 필터링 후 AllergyDto로 변환

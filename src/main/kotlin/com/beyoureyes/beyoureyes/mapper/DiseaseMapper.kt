@@ -1,6 +1,7 @@
 package com.beyoureyes.beyoureyes.mapper
 
 import com.beyoureyes.beyoureyes.entity.Disease
+import com.beyoureyes.beyoureyes.entity.DiseaseInfo
 import org.apache.ibatis.annotations.*
 
 @Mapper
@@ -29,7 +30,7 @@ interface DiseaseMapper {
         FROM disease 
         WHERE user_id = #{userId}
     """)
-    fun getDiseaseByUserId(userId: Long): Disease?
+    fun getDiseaseByUserId(userId: Long): DiseaseInfo?
 
     @Update("""
         UPDATE disease
