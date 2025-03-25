@@ -80,6 +80,7 @@ jobs:
             spring.datasource.password=${{ secrets.DB_PASSWORD }}
             firebase.configuration-file=firebase-key.json
             firebase.bucket=${{ secrets.FIREBASE_BUCKET }}
+            SERVER_SERVLET_CONTEXT_PATH=/v2
             EOF
 
             # 컨테이너 실행
