@@ -22,12 +22,7 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
 
     // v2/user/login : DB에 deviceId가 저장되어있는지 확인
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
-
-        val users = userMapper.findAll()
-
-        val user = users
-            .filterNotNull()
-            .find { it.deviceId == deviceId }
+        val user = userMapper.findByDeviceId(deviceId.trim())
 
         if (user == null) {
             return ResponseEntity
@@ -52,8 +47,8 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
         userMapper.updateRefreshToken(user.userId, refreshToken)
 
         return ResponseEntity.ok(ResponseUtil.success("로그인 성공", accessToken))
-
     }
+
 
 
 
