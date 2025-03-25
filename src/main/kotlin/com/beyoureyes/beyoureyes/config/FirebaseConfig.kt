@@ -24,9 +24,9 @@ class FirebaseConfig {
     @Bean
     @Throws(IOException::class)
     fun firebaseApp(): FirebaseApp {
-        val resource = File(account)
-        val inputStream = FileInputStream(resource)
-        //val inputStream = FileInputStream(account)  // 경로에서 파일 직접 로드 - 배포 환경!
+        //val resource = File(account)
+        //val inputStream = FileInputStream(resource)
+        val inputStream = FileInputStream(account)  // 경로에서 파일 직접 로드 - 배포 환경!
 
         val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(inputStream))
