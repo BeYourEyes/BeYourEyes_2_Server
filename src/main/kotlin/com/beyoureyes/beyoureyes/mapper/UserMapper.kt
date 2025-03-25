@@ -20,12 +20,21 @@ interface UserMapper {
     @Select("SELECT user_id, device_id, deleted_at FROM \"user\"")
     fun findAll(): List<User>
 
+    @Results(
+        id = "UserResultMap", value = [
+            Result(property = "userId", column = "user_id"),
+            Result(property = "deviceId", column = "device_id"),
+            Result(property = "lastLogin", column = "last_login"),
+            Result(property = "deletedAt", column = "deleted_at")
+        ]
+    )
     @Select("""
-        SELECT user_id, device_id, last_login, deleted_at
-        FROM "user"
-        WHERE device_id = #{deviceId}
-    """)
+    SELECT user_id, device_id, last_login, deleted_at
+    FROM "user"
+    WHERE device_id = #{deviceId}
+""")
     fun findByDeviceId(deviceId: String): User?
+
 
 
     @Insert("INSERT INTO \"user\" (device_id) VALUES (#{deviceId})")
