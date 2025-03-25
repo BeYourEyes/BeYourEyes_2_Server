@@ -23,7 +23,9 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
     // v2/user/login : DB에 deviceId가 저장되어있는지 확인
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
         val user = userMapper.findAll()
-            .find { it.deviceId != null && BCrypt.checkpw(deviceId, it.deviceId) }
+            .filter { it.deviceId != null }
+            .find { BCrypt.checkpw(deviceId, it.deviceId!!) }
+
 
         if (user == null) {
             return ResponseEntity
