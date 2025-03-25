@@ -78,14 +78,16 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
         return if (result > 0) newUser.userId else null
     }
 
-    fun deleteUser(userId: Long):Boolean {
-        return try{
-            userMapper.deleteUser(userId) > 0
-        } catch (e:Exception) {
+    fun deleteUser(userId: Long): Boolean {
+        return try {
+            val result = userMapper.deleteUser(userId)
+            result > 0
+        } catch (e: Exception) {
             e.printStackTrace()
             false
         }
     }
+
 
     fun getAllUsers() = userMapper.findAll()
 }
