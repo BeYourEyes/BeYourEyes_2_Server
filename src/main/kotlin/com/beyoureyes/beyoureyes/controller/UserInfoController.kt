@@ -25,10 +25,17 @@ class UserInfoController(
 ) {
     @PostMapping("/save-user")
     fun saveUserInfo(@Valid @RequestBody request: SaveUserRequestDto): ResponseEntity<out ResponseDto<out String?>> {
-        val userId = userService.createUser(request.device_id)
-            ?: return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ResponseUtil.error("사용자 생성 실패", null))
+        val userIdResult = userService.createUser(request.device_id)
+
+        if (userIdResult == -1L) {
+            return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ResponseUtil.failure("이미 가입된 사용자입니다.", null))
+        }
+
+        val userId = userIdResult ?: return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ResponseUtil.error("사용자 생성 실패", null))
 
         val allergy = Allergy(
             userId = userId,

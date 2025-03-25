@@ -23,19 +23,11 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
     // v2/user/login : DB에 deviceId가 저장되어있는지 확인
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
 
-        val users = userMapper.findAll() // null
+        val users = userMapper.findAll()
 
-        if (users.isEmpty()) {
-            return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ResponseUtil.no_data("존재하지 않는 사용자입니다. 정보 저장이 필요합니다.", null))
-        }
-
-
-        val user = userMapper.findAll()
+        val user = users
             .filterNotNull()
-            .find { it.deviceId != null && BCrypt.checkpw(deviceId, it.deviceId) }
-
+            .find { it.deviceId == deviceId }
 
         if (user == null) {
             return ResponseEntity
@@ -44,7 +36,7 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
         }
 
         if (user.deletedAt != null) {
-            userMapper.reactivateUser(user.userId!!) // deleted_at을 null로 변경
+            userMapper.reactivateUser(user.userId!!)
 
             val accessToken = jwtUtil.generateAccessToken(user.userId)
             val refreshToken = jwtUtil.generateRefreshToken(user.userId)
@@ -94,13 +86,18 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
     }
 
     fun createUser(deviceId: String): Long? {
-        val hashedDeviceId = BCrypt.hashpw(deviceId, BCrypt.gensalt())
-        val newUser = User(deviceId = hashedDeviceId)
+        val existingUser = userMapper.findByDeviceId(deviceId)
+        if (existingUser != null) {
+            return -1
+        }
 
-        // 유저를 생성하고, 생성된 userId를 반환
+        val newUser = User(deviceId = deviceId)
         val result = userMapper.insertUser(newUser)
+
         return if (result > 0) newUser.userId else null
     }
+
+
 
     fun deleteUser(userId: Long): Boolean {
         return try {
