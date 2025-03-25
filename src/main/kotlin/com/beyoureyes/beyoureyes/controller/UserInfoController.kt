@@ -118,7 +118,9 @@ class UserInfoController(
     }
 
     @PatchMapping("/update")
+
     fun updateUserInfo(@RequestBody request: Map<String, Any>): ResponseEntity<ResponseDto<Any?>> {
+
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
 
         val userBirthStr = request["user_birth"] as? String
