@@ -23,14 +23,6 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
     // v2/user/login : DB에 deviceId가 저장되어있는지 확인
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
 
-
-        val user2 = userMapper.findAll()
-            .find { it?.deviceId != null && BCrypt.checkpw(deviceId, it.deviceId) }
-        //println(user2)
-        userMapper.findAll().forEach {
-            println("user = $it")
-        }
-
         val users = userMapper.findAll() // null
 
         if (users.isEmpty()) {
@@ -67,25 +59,8 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
         val refreshToken = jwtUtil.generateRefreshToken(user.userId)
         userMapper.updateRefreshToken(user.userId, refreshToken)
 
-        return ResponseEntity.ok(ResponseUtil.success("로그인 성공", null))
+        return ResponseEntity.ok(ResponseUtil.success("로그인 성공", accessToken))
 
-//        if (user.deletedAt != null) {
-//            userMapper.reactivateUser(user.userId!!)
-//
-//            val accessToken = jwtUtil.generateAccessToken(user.userId)
-//            val refreshToken = jwtUtil.generateRefreshToken(user.userId)
-//            userMapper.updateRefreshToken(user.userId, refreshToken)
-//
-//            return ResponseEntity.ok(
-//                ResponseUtil.active("휴먼처리된 계정에서 일반 계정으로 전환합니다.", accessToken)
-//            )
-//        }
-
-//        val accessToken = jwtUtil.generateAccessToken(user.userId!!)
-//        val refreshToken = jwtUtil.generateRefreshToken(user.userId)
-//        userMapper.updateRefreshToken(user.userId, refreshToken)
-
-//        return ResponseEntity.ok(ResponseUtil.success("로그인 성공", accessToken))
     }
 
 

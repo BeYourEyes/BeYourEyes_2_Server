@@ -58,6 +58,8 @@ class DailyFoodController(
     fun getTodayNutrientSummary(): ResponseEntity<ResponseDto<NutrientSummaryDto>> {
         val userId = SecurityContextHolder.getContext().authentication.principal as Long
         val nutrientSummary = dailyFoodService.getTodayNutrientSummary(userId)
+            ?: NutrientSummaryDto(0, 0, 0, 0, 0, 0, 0, 0)
+
         return ResponseEntity.ok(ResponseUtil.success("오늘 섭취한 총 영양소 조회 성공", nutrientSummary))
     }
 
