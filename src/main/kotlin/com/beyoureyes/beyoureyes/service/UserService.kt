@@ -22,7 +22,16 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
 
     // v2/user/login : DB에 deviceId가 저장되어있는지 확인
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
-        val users = userMapper.findAll()
+
+
+        val user2 = userMapper.findAll()
+            .find { it?.deviceId != null && BCrypt.checkpw(deviceId, it.deviceId) }
+        //println(user2)
+        userMapper.findAll().forEach {
+            println("user = $it")
+        }
+
+        val users = userMapper.findAll() // null
 
         if (users.isEmpty()) {
             return ResponseEntity
@@ -31,9 +40,10 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
         }
 
 
-        val user = users.find {
-            it.deviceId != null && BCrypt.checkpw(deviceId, it.deviceId)
-        }
+        val user = userMapper.findAll()
+            .filterNotNull()
+            .find { it.deviceId != null && BCrypt.checkpw(deviceId, it.deviceId) }
+
 
         if (user == null) {
             return ResponseEntity
