@@ -22,15 +22,15 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
 
     // v2/user/login : DB에 deviceId가 저장되어있는지 확인
     fun login(deviceId: String): ResponseEntity<out ResponseDto<out String?>> {
-        val users = userMapper.findAll()
-
-        val user = users.find { BCrypt.checkpw(deviceId, it.deviceId) }
+        val user = userMapper.findAll()
+            .find { it.deviceId != null && BCrypt.checkpw(deviceId, it.deviceId) }
 
         if (user == null) {
             return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ResponseUtil.no_data("존재하지 않는 사용자입니다. 정보 저장이 필요합니다.", null))
         }
+
         if (user.deletedAt != null) {
             userMapper.reactivateUser(user.userId!!)
 
@@ -45,11 +45,11 @@ class UserService(private val userMapper: UserMapper, private val jwtUtil: JwtUt
 
         val accessToken = jwtUtil.generateAccessToken(user.userId!!)
         val refreshToken = jwtUtil.generateRefreshToken(user.userId)
-
         userMapper.updateRefreshToken(user.userId, refreshToken)
 
         return ResponseEntity.ok(ResponseUtil.success("로그인 성공", accessToken))
     }
+
 
 
     fun refreshAccessToken(accessToken: String): String? {
