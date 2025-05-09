@@ -1,8 +1,11 @@
-﻿# BeYourEyes_2_Backend
+# BeYourEyes_2_Backend
 
 ## 🧾 작업 기록 히스토리 (Changelog)
 
 > 프로젝트 발전 과정을 일자별로 기록한 로그입니다.
+
+<details>
+  <summary>작업 기록 히스토리 보기</summary>
 
 ### 📅 2월 3일
 - DB 모델링: `user`, `userinfo`, `allergy`, `disease`, `dailyfood` 테이블 설계
@@ -28,10 +31,10 @@
 
 ### 📅 3월 5일
 - Firebase 연결
-- 오늘 섭취 기록 저장 및 조회 구현
+- 오늘 섭취 기록 저장 및 조회 기능 구현
 - 매일 자정마다 섭취 기록 자동 삭제
 - 익명 로그인 방식을 access token + refresh token 구조로 변경
-- AWS EC2 + RDS에 임시 배포
+- AWS EC2 + RDS 임시 배포
 
 ### 📅 3월 6일
 - 개인정보/질환/알러지 수정 기능 분리
@@ -58,13 +61,17 @@
 ### 📅 3월 25일
 - GitHub Actions 자동 빌드 및 테스트 성공
 - API 전반 수정
-- 모든 API 안드로이드와 연동 완료
+- 모든 API 안드로이드 연동 완료
 
 ### 📅 4월 13일
 - DB 테이블 관계 리팩토링 (user_id → user_info_id 중심 구조)
 - 전체 Entity / Mapper / Service / Controller 리팩토링
 - PostgreSQL COALESCE 오류 해결 (`CAST` 활용)
 
-## 💻 BeYourEyes ERD
-![Image](https://github.com/user-attachments/assets/79fe5560-ba6f-4c7b-8cd4-a5653563079b)
+</details>
 
+---
+
+## 💻 BeYourEyes ERD
+
+![BeYourEyes ERD](https://github.com/user-attachments/assets/79fe5560-ba6f-4c7b-8cd4-a5653563079b)
