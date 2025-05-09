@@ -65,6 +65,6 @@
 - 전체 Entity / Mapper / Service / Controller 리팩토링
 - PostgreSQL COALESCE 오류 해결 (`CAST` 활용)
 
-
-
+## 💻 BeYourEyes ERD
+![Image](https://github.com/user-attachments/assets/79fe5560-ba6f-4c7b-8cd4-a5653563079b)
 
