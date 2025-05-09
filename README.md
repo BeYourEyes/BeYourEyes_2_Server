@@ -85,12 +85,15 @@ Firebase 이미지 저장, CI/CD 배포까지 포함한 백엔드 프로젝트�
 | Database | PostgreSQL |
 | ORM/Mapper | MyBatis |
 | Auth | JWT (Access Token, Refresh Token) |
-| Cloud | AWS EC2, RDS |
-| CI/CD | GitHub Actions + Docker |
 | Storage | Firebase Storage |
 | 문서화 | Swagger |
 
 ---
+
+## 📦 배포 환경
+- 온프레미스 서버 (자체 미니 PC)에 Docker 기반 배포
+- GitHub Actions → Docker Hub → SSH 원격 배포
+  
 
 ## 🧑‍💻 개발자
 
